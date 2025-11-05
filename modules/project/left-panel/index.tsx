@@ -14,7 +14,7 @@ export const LeftPanel = observer(() => {
       {/* Toolbar */}
       <Toolbar />
 
-      {/* Nodes Panel */}
+      {/* Nodes/Layers Panel */}
       <NodesPanel />
     </div>
   );

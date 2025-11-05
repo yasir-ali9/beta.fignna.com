@@ -81,6 +81,22 @@
   --font-mono: var(--font-jetbrains-mono);
 }
 
+/* Remove focus outline on mouse click, but keep for keyboard navigation */
+*:focus {
+  outline: none;
+}
+
+*:focus-visible {
+  /* outline: 1px solid rgb(var(--ac-01)); */
+  /* outline-offset: 1px; */
+  outline: none;
+}
+
+/* Prevent Space key from triggering click on focused elements */
+button:focus:not(:focus-visible) {
+  outline: none;
+}
+
 /* Theme transition */
 * {
   transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out,

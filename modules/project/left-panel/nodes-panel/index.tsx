@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useEditorEngine } from "@/lib/stores/editor/hooks";
 import { observer } from "mobx-react-lite";
+import { ChevronDownIcon } from "@/components/icons/common";
 import {
   ThreeDToolIcon,
   FrameToolIcon,
@@ -57,28 +58,15 @@ export const NodesPanel = observer(() => {
         onClick={() => setIsExpanded(!isExpanded)}
         className="w-full flex items-center justify-between px-3 py-2 transition-colors group"
       >
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-0.5">
           {/* Chevron Icon */}
-          <svg
-            width="12"
-            height="12"
-            viewBox="0 0 12 12"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className={`transition-all ${
-              isExpanded
-                ? "rotate-90 text-fg-50"
-                : "text-fg-60 group-hover:text-fg-50"
+          <div
+            className={`transition-transform text-fg-60 ${
+              isExpanded ? "rotate-0" : "-rotate-90"
             }`}
           >
-            <path
-              d="M4.5 2L8.5 6L4.5 10"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
+            <ChevronDownIcon size={14} />
+          </div>
           <span
             className={`text-[11.5px] font-normal transition-colors ${
               isExpanded ? "text-fg-50" : "text-fg-60 group-hover:text-fg-50"
@@ -95,8 +83,8 @@ export const NodesPanel = observer(() => {
       {isExpanded && (
         <div className="px-3 pb-3">
           {allNodes.length === 0 ? (
-            <div className="text-[11px] text-fg-30 text-center py-4">
-              No nodes yet
+            <div className="text-[11px] text-fg-60 text-center py-4">
+              No nodes/layers yet
             </div>
           ) : (
             <div className="space-y-1">

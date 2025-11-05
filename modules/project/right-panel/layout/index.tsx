@@ -55,7 +55,7 @@ export const Layout = observer(() => {
       {isExpanded && (
         <div className="px-3 pb-3 space-y-2">
           {/* Row 1: X, Y, Rotation */}
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-3 gap-1">
             <PropertyInput
               label="X"
               value={selectedNode.x}
@@ -81,7 +81,7 @@ export const Layout = observer(() => {
           </div>
 
           {/* Row 2: Width, Height, Opacity */}
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-3 gap-1">
             <PropertyInput
               label="W"
               value={selectedNode.width}

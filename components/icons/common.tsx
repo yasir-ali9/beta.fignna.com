@@ -59,3 +59,24 @@ export const CenterIcon: React.FC<IconProps> = ({
   </svg>
 );
 
+export const ChevronDownIcon: React.FC<IconProps> = ({
+  className = "",
+  size = 10,
+}) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 10 10"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    className={className}
+  >
+    <path
+      d="M7.08366 4.1665L5.00033 6.24984L2.91699 4.1665"
+      stroke="currentColor"
+      strokeWidth="0.833333"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
