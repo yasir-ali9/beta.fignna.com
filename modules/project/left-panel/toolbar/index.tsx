@@ -3,6 +3,7 @@
 import { observer } from "mobx-react-lite";
 import { useEditorEngine } from "@/lib/stores/editor/hooks";
 import { CanvasTool } from "@/lib/stores/editor/state";
+import { Tooltip } from "@/components/tooltip";
 import {
   MoveToolIcon,
   HandToolIcon,
@@ -17,12 +18,32 @@ const Toolbar = observer(() => {
   const editorEngine = useEditorEngine();
 
   const tools = [
-    { id: CanvasTool.MOVE, icon: MoveToolIcon, label: "Move (V)" },
-    { id: CanvasTool.HAND, icon: HandToolIcon, label: "Hand (H)" },
-    { id: CanvasTool.FRAME, icon: FrameToolIcon, label: "Frame (F)" },
-    { id: CanvasTool.THREE_D, icon: ThreeDToolIcon, label: "3D Tool" },
-    { id: CanvasTool.IMAGE, icon: ImageToolIcon, label: "Image (I)" },
-    { id: CanvasTool.COMMENT, icon: CommentToolIcon, label: "Comment (C)" },
+    { id: CanvasTool.MOVE, icon: MoveToolIcon, label: "Move", shortcut: "V" },
+    { id: CanvasTool.HAND, icon: HandToolIcon, label: "Hand", shortcut: "H" },
+    {
+      id: CanvasTool.FRAME,
+      icon: FrameToolIcon,
+      label: "Frame",
+      shortcut: "F",
+    },
+    {
+      id: CanvasTool.THREE_D,
+      icon: ThreeDToolIcon,
+      label: "3D Tool",
+      shortcut: "",
+    },
+    {
+      id: CanvasTool.IMAGE,
+      icon: ImageToolIcon,
+      label: "Image",
+      shortcut: "I",
+    },
+    {
+      id: CanvasTool.COMMENT,
+      icon: CommentToolIcon,
+      label: "Comment",
+      shortcut: "C",
+    },
   ];
 
   const handleToolClick = (toolId: CanvasTool) => {
@@ -49,44 +70,45 @@ const Toolbar = observer(() => {
   };
 
   return (
-    <div className="flex items-center gap-1 px-4 py-2 bg-bk-70 border-b border-bd-50">
-      {/* Tools */}
-      <div className="flex items-center gap-1">
-        {tools.map((tool) => {
-          const Icon = tool.icon;
-          const isActive = editorEngine.state.activeCanvasTool === tool.id;
+    <div className="px-1.5 pb-1.5">
+      <div className="flex items-center justify-between px-0.5 py-0.5 bg-bk-40 rounded-full">
+        {/* Tools */}
+        <div className="flex items-center">
+          {tools.map((tool) => {
+            const Icon = tool.icon;
+            const isActive = editorEngine.state.activeCanvasTool === tool.id;
+            const tooltipText = tool.shortcut
+              ? `${tool.label} (${tool.shortcut})`
+              : tool.label;
 
-          return (
-            <button
-              key={tool.id}
-              onClick={() => handleToolClick(tool.id)}
-              className={`
-                w-8 h-8 flex items-center justify-center rounded
-                transition-colors
-                ${
-                  isActive
-                    ? "bg-bk-50 text-fg-50 border border-bd-50"
-                    : "text-fg-40 hover:bg-bk-60 hover:text-fg-60"
-                }
-              `}
-              title={tool.label}
-            >
-              <Icon />
-            </button>
-          );
-        })}
+            return (
+              <Tooltip key={tool.id} content={tooltipText} position="bottom">
+                <button
+                  onClick={() => handleToolClick(tool.id)}
+                  className={`
+                    w-9 h-7 flex items-center justify-center rounded-full
+                    transition-colors
+                    ${
+                      isActive
+                        ? "bg-bk-20 text-fg-30"
+                        : "text-fg-40 hover:bg-bk-30 hover:text-fg-30"
+                    }
+                  `}
+                >
+                  <Icon size={14} />
+                </button>
+              </Tooltip>
+            );
+          })}
+        </div>
+
+        {/* Search */}
+        <Tooltip content="Search" position="bottom">
+          <button className="w-9 h-7 flex items-center justify-center rounded-full text-fg-40 hover:bg-bk-30 hover:text-fg-30 transition-colors">
+            <SearchToolIcon size={14} />
+          </button>
+        </Tooltip>
       </div>
-
-      {/* Separator */}
-      <div className="w-px h-6 bg-bd-50 mx-1" />
-
-      {/* Search */}
-      <button
-        className="w-8 h-8 flex items-center justify-center rounded text-fg-40 hover:bg-bk-60 hover:text-fg-20 transition-colors ml-auto"
-        title="Search"
-      >
-        <SearchToolIcon />
-      </button>
     </div>
   );
 });

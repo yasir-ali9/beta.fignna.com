@@ -109,7 +109,7 @@ export const NodesPanel = observer(() => {
                       editorEngine.nodes.isNodeSelected(node.id)
                         ? "bg-bk-30"
                         : editorEngine.nodes.hoveredNodeId === node.id
-                        ? "bg-bk-30"
+                        ? "bg-bk-40"
                         : "hover:bg-bk-40"
                     }`}
                     onClick={(e) => handleNodeClick(node.id, e)}

@@ -35,7 +35,7 @@ export function Header() {
 
   return (
     <>
-      <div className="p-3 border-b border-bd-50 flex items-center justify-between">
+      <div className="p-3 flex items-center justify-between">
         <button
           onContextMenu={showContextMenu}
           onClick={showContextMenu}
