@@ -1,0 +1,147 @@
+@import "tailwindcss";
+
+:root {
+  --bk-30: 212, 212, 212; /* #d4d4d4 */
+  --bk-40: 224, 224, 224; /* #e0e0e0 */
+  --bk-50: 242, 242, 242; /* #f2f2f2 */
+  --bk-60: 249, 249, 249; /* #f9f9f9 */
+  --bk-70: 255, 255, 255; /* #ffffff */
+
+  --bd-50: 216, 216, 216; /* #d8d8d8 */
+
+  --fg-30: 24, 24, 24; /* #181818 */
+  --fg-40: 31, 31, 31; /* #1f1f1f */
+  --fg-50: 49, 49, 49; /* #313131 */
+  --fg-60: 85, 85, 85; /* #555555 */
+  --fg-70: 114, 114, 114; /* #727272 */
+
+  --ac-01: 83, 36, 230; /* #5324e6 */
+}
+
+[data-theme="dark"] {
+  --bk-30: 51, 51, 51; /* #333333 */
+  --bk-40: 55, 55, 55; /* #373737 */
+  --bk-50: 42, 42, 42; /* #2a2a2a */
+  --bk-60: 30, 30, 30; /* #1e1e1e */
+  --bk-70: 18, 18, 18; /* #121212 */
+
+  --bd-50: 47, 47, 47; /* #2f2f2f */
+
+  --fg-30: 255, 255, 255; /* #ffffff */
+  --fg-40: 249, 249, 249; /* #f9f9f9 */
+  --fg-50: 228, 228, 228; /* #e4e4e4 */
+  --fg-60: 156, 156, 156; /* #9c9c9c */
+  --fg-70: 140, 140, 140; /* #8c8c8c */
+
+  --ac-01: 112, 70, 234; /* #7046ea */
+}
+
+/* System preference dark mode fallback */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --bk-30: 51, 51, 51; /* #333333 */
+    --bk-40: 55, 55, 55; /* #373737 */
+    --bk-50: 42, 42, 42; /* #2a2a2a */
+    --bk-60: 30, 30, 30; /* #1e1e1e */
+    --bk-70: 18, 18, 18; /* #121212 */
+
+    --bd-50: 47, 47, 47; /* #2f2f2f */
+
+    --fg-30: 255, 255, 255; /* #ffffff */
+    --fg-40: 249, 249, 249; /* #f9f9f9 */
+    --fg-50: 228, 228, 228; /* #e4e4e4 */
+    --fg-60: 156, 156, 156; /* #9c9c9c */
+    --fg-70: 140, 140, 140; /* #8c8c8c */
+
+    --ac-01: 112, 70, 234; /* #7046ea */
+  }
+}
+
+/* Tailwind CSS v4 theme configuration using inline directive */
+@theme inline {
+  --color-bk-30: rgb(var(--bk-30));
+  --color-bk-40: rgb(var(--bk-40));
+  --color-bk-50: rgb(var(--bk-50));
+  --color-bk-60: rgb(var(--bk-60));
+  --color-bk-70: rgb(var(--bk-70));
+
+  --color-bd-50: rgb(var(--bd-50));
+
+  --color-fg-30: rgb(var(--fg-30));
+  --color-fg-40: rgb(var(--fg-40));
+  --color-fg-50: rgb(var(--fg-50));
+  --color-fg-60: rgb(var(--fg-60));
+  --color-fg-70: rgb(var(--fg-70));
+
+  --color-ac-01: rgb(var(--ac-01));
+
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains-mono);
+}
+
+/* Theme transition */
+* {
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out,
+    border-color 0.2s ease-in-out;
+}
+
+body {
+  background: rgb(var(--bk-70));
+  color: rgb(var(--fg-50));
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+code,
+pre,
+kbd {
+  font-family: var(--font-mono), monospace;
+}
+
+/* Custom Scrollbar Styles - Theme Aware */
+/* Webkit browsers (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgb(var(--bk-60));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgb(var(--bd-50));
+  border-radius: 4px;
+  border: 1px solid rgb(var(--bk-60));
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(var(--fg-70));
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: rgb(var(--fg-60));
+}
+
+::-webkit-scrollbar-corner {
+  background: rgb(var(--bk-60));
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(var(--bd-50)) rgb(var(--bk-60));
+}
+
+/* For better scrollbar visibility in dark mode */
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: rgb(var(--fg-70));
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background: rgb(var(--fg-60));
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb:active {
+  background: rgb(var(--fg-50));
+}
