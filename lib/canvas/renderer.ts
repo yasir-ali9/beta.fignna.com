@@ -115,25 +115,15 @@ export class CanvasRenderer {
 
     // Draw node based on type
     if (node.type === "3d") {
-      // Draw 3D node placeholder
-      this.ctx.fillStyle = "#3a3a3a";
-      this.ctx.strokeStyle = isPending ? "#7a7aff" : "#5a5a5a";
-      this.ctx.lineWidth = isPending ? 2 : 1;
-      this.ctx.setLineDash(isPending ? [5, 5] : []);
-
-      this.ctx.fillRect(node.x, node.y, node.width, node.height);
-      this.ctx.strokeRect(node.x, node.y, node.width, node.height);
-
-      // Draw 3D icon in center
-      this.ctx.fillStyle = "#888888";
-      this.ctx.font = "14px system-ui, -apple-system, sans-serif";
-      this.ctx.textAlign = "center";
-      this.ctx.textBaseline = "middle";
-      this.ctx.fillText(
-        "3D node",
-        node.x + node.width / 2,
-        node.y + node.height / 2
-      );
+      // Don't draw anything for 3D nodes - they render as React components
+      // Only draw a subtle outline if pending
+      if (isPending) {
+        this.ctx.strokeStyle = "#7a7aff";
+        this.ctx.lineWidth = 2;
+        this.ctx.setLineDash([5, 5]);
+        this.ctx.strokeRect(node.x, node.y, node.width, node.height);
+      }
+      // No background, no placeholder - pure 3D object only
     } else if (node.type === "frame") {
       // Draw frame
       this.ctx.strokeStyle = isPending ? "#7a7aff" : "#6a6a6a";

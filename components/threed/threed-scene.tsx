@@ -8,7 +8,7 @@ import { EffectComposer, Bloom } from "@react-three/postprocessing";
 import { SVGModel } from "./svg-model";
 import { observer } from "mobx-react-lite";
 
-interface ModelPreviewProps {
+interface ThreeDSceneProps {
   svgData: string;
   depth: number;
   modelRotationY: number;
@@ -30,9 +30,11 @@ interface ModelPreviewProps {
   bloomIntensity?: number;
   bloomMipmapBlur?: boolean;
   modelRef?: React.RefObject<THREE.Group | null>;
+  nodeWidth: number;
+  nodeHeight: number;
 }
 
-export const ModelPreview = observer(
+export const ThreeDScene = observer(
   ({
     svgData,
     depth,
@@ -55,10 +57,13 @@ export const ModelPreview = observer(
     bloomIntensity = 1.0,
     bloomMipmapBlur = true,
     modelRef: externalModelRef,
-  }: ModelPreviewProps) => {
+    nodeWidth,
+    nodeHeight,
+  }: ThreeDSceneProps) => {
     const modelGroupRef = useRef<THREE.Group | null>(null);
     const internalModelRef = useRef<THREE.Group | null>(null);
     const modelRef = externalModelRef || internalModelRef;
+    const cameraRef = useRef<THREE.Camera | null>(null);
 
     if (!svgData) {
       return (
@@ -70,11 +75,14 @@ export const ModelPreview = observer(
       );
     }
 
+    // Keep camera at fixed distance - model size stays consistent
+    const cameraDistance = 150;
+
     return (
-      <div className="w-full h-full">
+      <div className="w-full h-full overflow-hidden">
         <Canvas
           shadows
-          camera={{ position: [0, 0, 150], fov: 50 }}
+          camera={{ position: [0, 0, cameraDistance], fov: 50 }}
           dpr={[1, 2]}
           gl={{
             antialias: true,
@@ -84,8 +92,17 @@ export const ModelPreview = observer(
             powerPreference: "high-performance",
             alpha: true,
           }}
+          style={{
+            background: "transparent",
+            width: "100%",
+            height: "100%",
+            display: "block",
+          }}
+          onCreated={({ camera }) => {
+            cameraRef.current = camera;
+            (window as any).__current3DCamera = camera;
+          }}
         >
-          <color attach="background" args={[backgroundColor]} />
           <ambientLight intensity={0.6 * Math.PI} />
           <directionalLight
             position={[50, 50, 100]}
@@ -120,9 +137,9 @@ export const ModelPreview = observer(
             autoRotateSpeed={autoRotateSpeed}
             minDistance={50}
             maxDistance={400}
-            enablePan={true}
-            enableZoom={true}
-            enableRotate={true}
+            enablePan={false}
+            enableZoom={false}
+            enableRotate={false}
             target={[0, 0, 0]}
           />
 
@@ -144,4 +161,4 @@ export const ModelPreview = observer(
   }
 );
 
-ModelPreview.displayName = "ModelPreview";
+ThreeDScene.displayName = "ThreeDScene";

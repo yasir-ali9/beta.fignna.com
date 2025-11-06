@@ -73,58 +73,17 @@ export const Background = observer(() => {
       {/* Section Content */}
       {isExpanded && (
         <div className="px-3 pb-3 space-y-3">
-          {/* Info Alert */}
+          {/* Info */}
           <div className="bg-bk-40 border border-bd-50 rounded p-2">
             <p className="text-[10px] text-fg-60 leading-relaxed">
-              ℹ️ Background settings are for preview only and will not be
-              included in the exported 3D model.
+              ℹ️ This sets the canvas background color for frames and other
+              elements.
             </p>
           </div>
 
-          {/* Background Color Label */}
+          {/* Color Picker */}
           <div className="space-y-2">
             <label className="text-[11px] text-fg-60">Background Color</label>
-            <div className="text-[10px] text-fg-70">
-              Currently using:{" "}
-              {modelState.userSelectedBackground
-                ? "Custom selection"
-                : "Theme default"}
-            </div>
-          </div>
-
-          {/* Color Presets - Visual Buttons */}
-          <div className="grid grid-cols-5 gap-2">
-            {BACKGROUND_COLOR_PRESETS.map((preset) => (
-              <button
-                key={preset.name}
-                onClick={() =>
-                  handleBackgroundChange(preset.color, preset.name)
-                }
-                className={`
-                  flex flex-col items-center p-2 rounded transition-colors
-                  ${
-                    modelState.solidColorPreset === preset.name
-                      ? "bg-bk-20 ring-1 ring-fg-40"
-                      : "bg-bk-40 hover:bg-bk-30"
-                  }
-                `}
-              >
-                <div
-                  className="w-10 h-10 rounded-full mb-1 border border-bd-50"
-                  style={{
-                    background: preset.color,
-                  }}
-                />
-                <span className="text-[9px] text-fg-60 text-center leading-tight">
-                  {preset.label}
-                </span>
-              </button>
-            ))}
-          </div>
-
-          {/* Custom Color Picker */}
-          <div className="space-y-2 pt-2 border-t border-bd-50">
-            <label className="text-[11px] text-fg-60">Custom Color</label>
             <div className="flex items-center gap-2">
               <input
                 type="color"
@@ -143,16 +102,6 @@ export const Background = observer(() => {
                 className="flex-1 text-[11px] bg-bk-40 text-fg-50 rounded px-2 py-1.5 border border-bd-50"
               />
             </div>
-          </div>
-
-          {/* Reset to Theme Button */}
-          <div className="pt-2">
-            <button
-              onClick={handleResetToTheme}
-              className="w-full text-[11px] bg-bk-40 text-fg-50 rounded px-3 py-2 hover:bg-bk-30 transition-colors border border-bd-50"
-            >
-              Reset to Theme Default
-            </button>
           </div>
         </div>
       )}

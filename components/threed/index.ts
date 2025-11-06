@@ -1,4 +1,4 @@
 export { SVGModel } from "./svg-model";
-export { ModelPreview } from "./model-preview";
+export { ThreeDScene } from "./threed-scene";
 export { SVGUpload } from "./svg-upload";
 export { ThreeDNodeRenderer } from "./threed-node-renderer";

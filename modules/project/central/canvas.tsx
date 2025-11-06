@@ -37,12 +37,18 @@ export const Canvas = observer(() => {
   const handleCanvasMouseDown = (
     event: React.MouseEvent<HTMLDivElement | HTMLCanvasElement>
   ) => {
-    // Allow interaction on both container and canvas
-    if (
-      event.target !== containerRef.current &&
-      event.target !== canvasRef.current
-    )
-      return;
+    // Check if clicking on a 3D node overlay
+    const target = event.target as HTMLElement;
+    const threeDNodeElement = target.closest("[data-node-type='3d']");
+    const isClickingRotationHandle = target.closest(".rotation-handle");
+
+    // Allow interaction on canvas, container, or 3D node overlays
+    const isValidTarget =
+      event.target === containerRef.current ||
+      event.target === canvasRef.current ||
+      threeDNodeElement !== null;
+
+    if (!isValidTarget) return;
 
     // If there's a pending layer, drop it at cursor position
     if (pendingNode && canvasRef.current) {
@@ -89,6 +95,36 @@ export const Canvas = observer(() => {
       // Convert to world coordinates
       const worldX = (canvasX - position.x) / scale;
       const worldY = (canvasY - position.y) / scale;
+
+      // If clicking on rotation handle, don't interfere
+      if (isClickingRotationHandle) {
+        return;
+      }
+
+      // If clicking on a 3D node overlay, handle it directly
+      if (threeDNodeElement) {
+        const nodeId = threeDNodeElement.getAttribute("data-node-id");
+        if (nodeId) {
+          const node = editorEngine.nodes.getNode(nodeId);
+          if (node) {
+            const multiSelect = event.ctrlKey || event.metaKey;
+            editorEngine.nodes.selectNode(nodeId, multiSelect);
+
+            // Start dragging if not multi-selecting
+            if (!multiSelect) {
+              interactionsManager.draggable.startDrag(
+                nodeId,
+                worldX,
+                worldY,
+                node
+              );
+              setIsLayerDragging(true);
+              document.body.style.cursor = "move";
+            }
+            return;
+          }
+        }
+      }
 
       // Check if clicking on selected layer's edge/corner (Figma-like)
       if (selectedNodeId) {
@@ -656,6 +692,33 @@ export const Canvas = observer(() => {
           transform: `translate(${position.x}px, ${position.y}px) scale(${scale})`,
           transformOrigin: "0 0",
         }}
+        onMouseDown={handleCanvasMouseDown}
+        onMouseMove={(e) => {
+          // Handle hover for 3D nodes
+          const target = e.target as HTMLElement;
+          const threeDNodeElement = target.closest("[data-node-type='3d']");
+
+          if (
+            threeDNodeElement &&
+            isMoveToolActive &&
+            !isLayerDragging &&
+            !isLayerResizing
+          ) {
+            const nodeId = threeDNodeElement.getAttribute("data-node-id");
+            if (
+              nodeId &&
+              !editorEngine.nodes.selectedNodeIds.includes(nodeId)
+            ) {
+              editorEngine.nodes.setHoveredNode(nodeId);
+            }
+          }
+        }}
+        onMouseLeave={() => {
+          // Clear hover when leaving 3D overlay area
+          if (!isLayerDragging && !isLayerResizing) {
+            editorEngine.nodes.setHoveredNode(null);
+          }
+        }}
       >
         {editorEngine.nodes.nodes
           .filter((node) => node.type === "3d")
@@ -663,6 +726,8 @@ export const Canvas = observer(() => {
             <div
               key={node.id}
               className="pointer-events-auto"
+              data-node-id={node.id}
+              data-node-type="3d"
               style={{
                 position: "absolute",
                 left: node.x,

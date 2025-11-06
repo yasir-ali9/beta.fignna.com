@@ -10,7 +10,7 @@ import {
 } from "react";
 import * as THREE from "three";
 import { SVGLoader } from "three/examples/jsm/loaders/SVGLoader.js";
-import { Center } from "@react-three/drei";
+// Removed Center import - manual centering for better control
 
 interface SVGModelProps {
   svgData: string;
@@ -320,40 +320,38 @@ export const SVGModel = forwardRef<THREE.Group, SVGModelProps>(
     const yOffset = size.y / -2;
 
     return (
-      <Center>
-        <group
-          ref={groupRef}
-          scale={[scale, -scale, scale]}
-          position={[0, 0, 0]}
-          rotation={[0, Math.PI / 4, 0]}
-        >
-          {shapesWithMaterials.map((shapeItem, i) => (
-            <group key={i} renderOrder={shapeItem.renderOrder}>
-              {shapeItem.shapes.map((shape, j) => (
-                <mesh
-                  key={j}
-                  castShadow={castShadow}
-                  receiveShadow={receiveShadow}
-                  renderOrder={shapeItem.renderOrder}
-                  position={[
-                    xOffset,
-                    yOffset,
-                    shapeItem.isHole ? -depth / 4 : -depth / 2,
-                  ]}
-                >
-                  <extrudeGeometry
-                    args={[shape, getExtrudeSettings(shapeItem.isHole)]}
-                  />
-                  <primitive
-                    object={getMaterial(shapeItem.color, shapeItem.isHole)}
-                    attach="material"
-                  />
-                </mesh>
-              ))}
-            </group>
-          ))}
-        </group>
-      </Center>
+      <group
+        ref={groupRef}
+        scale={[scale, -scale, scale]}
+        position={[0, 0, 0]}
+        rotation={[0, Math.PI / 4, 0]}
+      >
+        {shapesWithMaterials.map((shapeItem, i) => (
+          <group key={i} renderOrder={shapeItem.renderOrder}>
+            {shapeItem.shapes.map((shape, j) => (
+              <mesh
+                key={j}
+                castShadow={castShadow}
+                receiveShadow={receiveShadow}
+                renderOrder={shapeItem.renderOrder}
+                position={[
+                  xOffset,
+                  yOffset,
+                  shapeItem.isHole ? -depth / 4 : -depth / 2,
+                ]}
+              >
+                <extrudeGeometry
+                  args={[shape, getExtrudeSettings(shapeItem.isHole)]}
+                />
+                <primitive
+                  object={getMaterial(shapeItem.color, shapeItem.isHole)}
+                  attach="material"
+                />
+              </mesh>
+            ))}
+          </group>
+        ))}
+      </group>
     );
   }
 );

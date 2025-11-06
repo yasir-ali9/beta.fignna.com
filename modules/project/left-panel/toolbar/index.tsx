@@ -52,7 +52,7 @@ const Toolbar = observer(() => {
     // Set pending layer based on tool (Figma-like behavior)
     switch (toolId) {
       case CanvasTool.THREE_D:
-        editorEngine.nodes.setPendingNode("3d", 200, 200);
+        editorEngine.nodes.setPendingNode("3d", 500, 500);
         break;
       case CanvasTool.FRAME:
         editorEngine.nodes.setPendingNode("frame", 300, 300);
