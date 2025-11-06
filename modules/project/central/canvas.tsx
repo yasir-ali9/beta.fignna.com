@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect, useState, useCallback } from "react";
+import React, { useRef, useEffect, useState, useCallback } from "react";
 import { useEditorEngine } from "@/lib/stores/editor/hooks";
 import { observer } from "mobx-react-lite";
 import { reaction } from "mobx";
@@ -8,6 +8,7 @@ import { canvasManager } from "@/lib/canvas/manager";
 import { interactionsManager } from "@/lib/canvas/interactions";
 import { shortcutsManager } from "@/lib/shortcuts";
 import { ThreeDNodeRenderer } from "@/components/threed";
+import { RotateIcon } from "@/components/icons/canvas";
 
 const ZOOM_STEP = 0.05;
 const PAN_SENSITIVITY = 1;
@@ -37,12 +38,12 @@ export const Canvas = observer(() => {
   const handleCanvasMouseDown = (
     event: React.MouseEvent<HTMLDivElement | HTMLCanvasElement>
   ) => {
-    // Check if clicking on a 3D node overlay
+    // Check if clicking on a 3D node
     const target = event.target as HTMLElement;
     const threeDNodeElement = target.closest("[data-node-type='3d']");
     const isClickingRotationHandle = target.closest(".rotation-handle");
 
-    // Allow interaction on canvas, container, or 3D node overlays
+    // Allow canvas, container, or 3D node interactions
     const isValidTarget =
       event.target === containerRef.current ||
       event.target === canvasRef.current ||
@@ -685,61 +686,77 @@ export const Canvas = observer(() => {
         }}
       />
 
-      {/* 3D Nodes Overlay - rendered as React components */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          transform: `translate(${position.x}px, ${position.y}px) scale(${scale})`,
-          transformOrigin: "0 0",
-        }}
-        onMouseDown={handleCanvasMouseDown}
-        onMouseMove={(e) => {
-          // Handle hover for 3D nodes
-          const target = e.target as HTMLElement;
-          const threeDNodeElement = target.closest("[data-node-type='3d']");
+      {/* 3D Nodes Overlay - positioned absolutely like canvas nodes */}
+      {editorEngine.nodes.nodes
+        .filter((node) => node.type === "3d")
+        .map((node) => {
+          const isSelected = editorEngine.nodes.selectedNodeIds.includes(
+            node.id
+          );
+          return (
+            <React.Fragment key={node.id}>
+              {/* 3D Node Container */}
+              <div
+                data-node-id={node.id}
+                data-node-type="3d"
+                className="absolute pointer-events-auto"
+                style={{
+                  left: position.x + node.x * scale,
+                  top: position.y + node.y * scale,
+                  width: node.width * scale,
+                  height: node.height * scale,
+                  transform: `rotate(${node.rotation || 0}deg)`,
+                  opacity: node.opacity || 1,
+                }}
+                onMouseDown={handleCanvasMouseDown}
+                onMouseMove={(e) => {
+                  if (
+                    isMoveToolActive &&
+                    !isLayerDragging &&
+                    !isLayerResizing
+                  ) {
+                    if (!isSelected) {
+                      editorEngine.nodes.setHoveredNode(node.id);
+                    }
+                  }
+                }}
+                onMouseLeave={() => {
+                  if (!isLayerDragging && !isLayerResizing) {
+                    editorEngine.nodes.setHoveredNode(null);
+                  }
+                }}
+              >
+                <ThreeDNodeRenderer node={node} />
+              </div>
 
-          if (
-            threeDNodeElement &&
-            isMoveToolActive &&
-            !isLayerDragging &&
-            !isLayerResizing
-          ) {
-            const nodeId = threeDNodeElement.getAttribute("data-node-id");
-            if (
-              nodeId &&
-              !editorEngine.nodes.selectedNodeIds.includes(nodeId)
-            ) {
-              editorEngine.nodes.setHoveredNode(nodeId);
-            }
-          }
-        }}
-        onMouseLeave={() => {
-          // Clear hover when leaving 3D overlay area
-          if (!isLayerDragging && !isLayerResizing) {
-            editorEngine.nodes.setHoveredNode(null);
-          }
-        }}
-      >
-        {editorEngine.nodes.nodes
-          .filter((node) => node.type === "3d")
-          .map((node) => (
-            <div
-              key={node.id}
-              className="pointer-events-auto"
-              data-node-id={node.id}
-              data-node-type="3d"
-              style={{
-                position: "absolute",
-                left: node.x,
-                top: node.y,
-                width: node.width,
-                height: node.height,
-              }}
-            >
-              <ThreeDNodeRenderer node={node} />
-            </div>
-          ))}
-      </div>
+              {/* Rotation Handle - Rendered separately at fixed 32px size */}
+              {isSelected && (
+                <div
+                  className="rotation-handle absolute bg-white rounded-full shadow-lg flex items-center justify-center cursor-pointer hover:bg-gray-100 transition-colors pointer-events-auto"
+                  onMouseDown={(e) => {
+                    e.stopPropagation();
+                    const handler = (window as any)[
+                      `__rotateHandler_${node.id}`
+                    ];
+                    if (handler) {
+                      handler({ clientX: e.clientX });
+                    }
+                  }}
+                  style={{
+                    // Position at top-right corner, offset by half the icon size (16px) and padding (8px)
+                    left: position.x + (node.x + node.width) * scale - 16 - 8,
+                    top: position.y + node.y * scale - 16 + 8,
+                    width: "32px",
+                    height: "32px",
+                    zIndex: 1000,
+                  }}
+                >
+                  <RotateIcon size={20} className="text-gray-700" />
+                </div>
+              )}
+            </React.Fragment>
+          );
+        })}
     </div>
   );
 });

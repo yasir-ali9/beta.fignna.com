@@ -74,15 +74,15 @@ export class CanvasRenderer {
 
         // Draw selection box for selected nodes/layers
         if (isSelected) {
-          this.drawSelectionBox(node, false);
+          this.drawSelectionBox(node, false, scale);
           // Only show resize handles for single selection
           if (selectedNodeIds?.length === 1) {
-            this.drawResizeHandles(node);
+            this.drawResizeHandles(node, scale);
           }
         }
         // Draw hover box for hovered node/layer (no handles)
         else if (isHovered) {
-          this.drawSelectionBox(node, true);
+          this.drawSelectionBox(node, true, scale);
         }
       });
     }
@@ -194,10 +194,11 @@ export class CanvasRenderer {
     this.ctx.restore();
   }
 
-  drawSelectionBox(node: any, isHover = false) {
+  drawSelectionBox(node: any, isHover = false, scale = 1) {
     this.ctx.save();
     this.ctx.strokeStyle = "#4a9eff";
-    this.ctx.lineWidth = 2;
+    // Fixed 1px line width regardless of zoom
+    this.ctx.lineWidth = 1 / scale;
     this.ctx.setLineDash([]);
 
     // Slightly transparent for hover
@@ -224,10 +225,11 @@ export class CanvasRenderer {
     this.ctx.restore();
   }
 
-  drawResizeHandles(node: any) {
+  drawResizeHandles(node: any, scale = 1) {
     this.ctx.save();
 
-    const handleSize = 8;
+    // Fixed 8px handle size regardless of zoom
+    const handleSize = 8 / scale;
     const halfHandle = handleSize / 2;
 
     // Only corner handles (Figma-like)
@@ -245,7 +247,8 @@ export class CanvasRenderer {
     handles.forEach((handle) => {
       this.ctx.fillStyle = "#ffffff";
       this.ctx.strokeStyle = "#4a9eff";
-      this.ctx.lineWidth = 1.5;
+      // Fixed 1.5px border regardless of zoom
+      this.ctx.lineWidth = 1.5 / scale;
       this.ctx.fillRect(handle.x, handle.y, handleSize, handleSize);
       this.ctx.strokeRect(handle.x, handle.y, handleSize, handleSize);
     });
