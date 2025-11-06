@@ -10,6 +10,9 @@ export interface CanvasNode {
   rotation?: number;
   opacity?: number; // 0 to 1
   data?: any;
+  // 3D-specific data (when type is "3d")
+  svgData?: string; // SVG content for 3D conversion
+  fileName?: string; // Original file name
 }
 
 export class NodesManager {

@@ -4,6 +4,7 @@ import { StateManager } from "./state";
 import { ProjectsManager } from "./projects";
 import { FilesManager } from "./files";
 import { NodesManager } from "./nodes";
+import { ThreeDManager } from "./threed";
 
 export class EditorEngine {
   canvas: CanvasManager;
@@ -11,6 +12,7 @@ export class EditorEngine {
   projects: ProjectsManager;
   files: FilesManager;
   nodes: NodesManager;
+  threed: ThreeDManager;
 
   constructor() {
     this.canvas = new CanvasManager();
@@ -18,6 +20,7 @@ export class EditorEngine {
     this.projects = new ProjectsManager(this);
     this.files = new FilesManager(this);
     this.nodes = new NodesManager();
+    this.threed = new ThreeDManager();
 
     makeAutoObservable(this);
   }
@@ -30,5 +33,6 @@ export class EditorEngine {
     // Cleanup resources when editor is unmounted
     this.projects.dispose();
     this.files.dispose();
+    this.threed.clearAllStates();
   }
 }

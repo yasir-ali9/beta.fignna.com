@@ -3,32 +3,52 @@
 import { useEditorEngine } from "@/lib/stores/editor/hooks";
 import { observer } from "mobx-react-lite";
 import { useState } from "react";
-import { Tooltip } from "@/components/tooltip";
 import { PlusIcon, MinusIcon } from "@/components/icons/common";
+import { handleExport, PNG_RESOLUTIONS } from "@/lib/threed/exporters";
 
 export const Export = observer(() => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [exportFormat, setExportFormat] = useState("GLB");
-  const [exportQuality, setExportQuality] = useState("High");
+  const [isExporting, setIsExporting] = useState(false);
   const editorEngine = useEditorEngine();
-  const currentProject = editorEngine.projects.currentProject;
+  const selectedNodeId = editorEngine.nodes.selectedNodeId;
+  const selectedNode = selectedNodeId
+    ? editorEngine.nodes.getNode(selectedNodeId)
+    : null;
 
-  const handleExport = () => {
-    if (!currentProject) return;
+  const is3DNode = selectedNode?.type === "3d";
+  const modelState = is3DNode
+    ? editorEngine.threed.getModelState(selectedNode.id)
+    : null;
 
-    console.log("Exporting project:", {
-      project: currentProject,
-      format: exportFormat,
-      quality: exportQuality,
-    });
-
-    // TODO: Implement actual export functionality
-    alert(`Exporting as ${exportFormat} with ${exportQuality} quality`);
-  };
-
-  if (!currentProject) {
+  // Only show for 3D nodes - return after all hooks
+  if (!is3DNode || !selectedNode || !modelState) {
     return null;
   }
+
+  const handleExportClick = async (
+    format: "stl" | "gltf" | "glb" | "png",
+    resolution: number = 1
+  ) => {
+    setIsExporting(true);
+    try {
+      // Get the model ref from window (temporary solution)
+      const modelRef = { current: (window as any).__current3DModel || null };
+      const fileName = modelState.fileName || "model";
+
+      // For PNG, we need the canvas element
+      let canvasElement: HTMLCanvasElement | null = null;
+      if (format === "png") {
+        canvasElement = document.querySelector("canvas");
+      }
+
+      await handleExport(format, modelRef, fileName, resolution, canvasElement);
+    } catch (error) {
+      console.error("Export error:", error);
+      alert("Export failed");
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   return (
     <div className="border-b border-bd-50">
@@ -56,43 +76,66 @@ export const Export = observer(() => {
       {/* Section Content */}
       {isExpanded && (
         <div className="px-3 pb-3 space-y-3">
-          {/* Format and Quality in single row */}
-          <div className="grid grid-cols-2 gap-2">
-            <Tooltip content="Export format" position="top">
-              <select
-                value={exportFormat}
-                onChange={(e) => setExportFormat(e.target.value)}
-                className="w-full text-[11px] bg-bk-40 text-fg-50 rounded p-2 border border-bd-50"
+          {/* Export 3D Models */}
+          <div className="space-y-2">
+            <label className="text-[11px] text-fg-60">Export 3D Model</label>
+            <div className="grid grid-cols-3 gap-2">
+              <button
+                onClick={() => handleExportClick("stl")}
+                disabled={isExporting}
+                className="text-[10px] py-2 rounded transition-colors bg-bk-40 text-fg-50 hover:bg-bk-30 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <option>GLB</option>
-                <option>GLTF</option>
-                <option>OBJ</option>
-                <option>STL</option>
-                <option>PLY</option>
-              </select>
-            </Tooltip>
-
-            <Tooltip content="Export quality" position="top">
-              <select
-                value={exportQuality}
-                onChange={(e) => setExportQuality(e.target.value)}
-                className="w-full text-[11px] bg-bk-40 text-fg-50 rounded p-2 border border-bd-50"
+                {isExporting ? "..." : "STL"}
+              </button>
+              <button
+                onClick={() => handleExportClick("glb")}
+                disabled={isExporting}
+                className="text-[10px] py-2 rounded transition-colors bg-bk-40 text-fg-50 hover:bg-bk-30 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <option>Low</option>
-                <option>Medium</option>
-                <option>High</option>
-                <option>Ultra</option>
-              </select>
-            </Tooltip>
+                {isExporting ? "..." : "GLB"}
+              </button>
+              <button
+                onClick={() => handleExportClick("gltf")}
+                disabled={isExporting}
+                className="text-[10px] py-2 rounded transition-colors bg-bk-40 text-fg-50 hover:bg-bk-30 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isExporting ? "..." : "GLTF"}
+              </button>
+            </div>
+            <p className="text-[9px] text-fg-70 leading-relaxed">
+              STL for 3D printing, GLB/GLTF for 3D apps
+            </p>
           </div>
 
-          {/* Export Button */}
-          <button
-            onClick={handleExport}
-            className="w-full py-2 px-3 bg-bk-30 text-fg-50 rounded text-[11px] hover:bg-bk-20 transition-colors border border-bd-50"
-          >
-            Export 3D Model
-          </button>
+          {/* Export Images */}
+          <div className="space-y-2 pt-2 border-t border-bd-50">
+            <label className="text-[11px] text-fg-60">Export Image</label>
+            <div className="grid grid-cols-3 gap-2">
+              {PNG_RESOLUTIONS.map((resolution) => (
+                <button
+                  key={resolution.multiplier}
+                  onClick={() =>
+                    handleExportClick("png", resolution.multiplier)
+                  }
+                  disabled={isExporting}
+                  className="text-[10px] py-2 rounded transition-colors bg-bk-40 text-fg-50 hover:bg-bk-30 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isExporting ? "..." : resolution.label.split(" ")[0]}
+                </button>
+              ))}
+            </div>
+            <p className="text-[9px] text-fg-70 leading-relaxed">
+              Low (1x), Medium (2x), High (3x) quality
+            </p>
+          </div>
+
+          {/* Info */}
+          <div className="bg-bk-40 border border-bd-50 rounded p-2 mt-2">
+            <p className="text-[10px] text-fg-60 leading-relaxed">
+              💡 Tip: Use STL for 3D printing, GLB for games/AR, PNG for
+              presentations
+            </p>
+          </div>
         </div>
       )}
     </div>

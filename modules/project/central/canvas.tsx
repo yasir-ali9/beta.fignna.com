@@ -7,6 +7,7 @@ import { reaction } from "mobx";
 import { canvasManager } from "@/lib/canvas/manager";
 import { interactionsManager } from "@/lib/canvas/interactions";
 import { shortcutsManager } from "@/lib/shortcuts";
+import { ThreeDNodeRenderer } from "@/components/threed";
 
 const ZOOM_STEP = 0.05;
 const PAN_SENSITIVITY = 1;
@@ -647,6 +648,33 @@ export const Canvas = observer(() => {
           cursor: pendingNode ? "crosshair" : getCursor(),
         }}
       />
+
+      {/* 3D Nodes Overlay - rendered as React components */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          transform: `translate(${position.x}px, ${position.y}px) scale(${scale})`,
+          transformOrigin: "0 0",
+        }}
+      >
+        {editorEngine.nodes.nodes
+          .filter((node) => node.type === "3d")
+          .map((node) => (
+            <div
+              key={node.id}
+              className="pointer-events-auto"
+              style={{
+                position: "absolute",
+                left: node.x,
+                top: node.y,
+                width: node.width,
+                height: node.height,
+              }}
+            >
+              <ThreeDNodeRenderer node={node} />
+            </div>
+          ))}
+      </div>
     </div>
   );
 });
