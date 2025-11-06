@@ -69,9 +69,7 @@ export const Layout = observer(() => {
             <PropertyInput
               icon={<AngleIcon size={14} />}
               value={
-                selectedNode.rotation !== undefined
-                  ? selectedNode.rotation
-                  : 180
+                selectedNode.rotation !== undefined ? selectedNode.rotation : 0
               }
               onChange={(value) => handleUpdate("rotation", value)}
               unit="°"

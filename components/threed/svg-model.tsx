@@ -285,11 +285,18 @@ export const SVGModel = forwardRef<THREE.Group, SVGModelProps>(
 
     if (shapesWithMaterials.length === 0) return null;
 
+    // Scale bevel values to match the model's coordinate space
+    // Since the group is scaled, bevel needs to be in the original SVG coordinate space
+    const scaledBevelThickness = bevelThickness / scale;
+    const scaledBevelSize = bevelSize / scale;
+
     const getExtrudeSettings = (isHole: boolean) => ({
       depth,
       bevelEnabled,
-      bevelThickness: isHole ? bevelThickness * 1.05 : bevelThickness,
-      bevelSize: isHole ? bevelSize * 1.05 : bevelSize,
+      bevelThickness: isHole
+        ? scaledBevelThickness * 1.05
+        : scaledBevelThickness,
+      bevelSize: isHole ? scaledBevelSize * 1.05 : scaledBevelSize,
       bevelSegments: Math.max(4, bevelSegments),
       curveSegments: Math.max(8, bevelSegments * 2),
     });

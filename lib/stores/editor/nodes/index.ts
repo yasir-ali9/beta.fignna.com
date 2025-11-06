@@ -54,7 +54,7 @@ export class NodesManager {
   // Add node/layer at specific position (when user clicks)
   addNode(node: Omit<CanvasNode, "id">) {
     const newNode: CanvasNode = {
-      rotation: 180, // Default rotation
+      rotation: 0, // Default rotation (0 degrees)
       ...node,
       id: `node-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
     };
