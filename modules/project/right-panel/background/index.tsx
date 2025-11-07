@@ -72,34 +72,42 @@ export const Background = observer(() => {
 
       {/* Section Content */}
       {isExpanded && (
-        <div className="px-3 pb-3 space-y-3">
-          {/* Info */}
-          <div className="bg-bk-40 border border-bd-50 rounded p-2">
-            <p className="text-[10px] text-fg-60 leading-relaxed">
-              ℹ️ This sets the canvas background color for frames and other
-              elements.
-            </p>
-          </div>
+        <div className="px-3 pb-2 space-y-2">
+          {/* ℹ️ This sets the canvas background color for frames and other elements. */}
 
-          {/* Color Picker */}
-          <div className="space-y-2">
-            <label className="text-[11px] text-fg-60">Background Color</label>
-            <div className="flex items-center gap-2">
-              <input
-                type="color"
-                value={modelState.backgroundColor}
-                onChange={(e) =>
-                  handleBackgroundChange(e.target.value, "custom")
-                }
-                className="w-8 h-8 rounded cursor-pointer border border-bd-50"
-              />
+          {/* Color Picker - Integrated Design */}
+          <div className="space-y-1">
+            <label className="text-[10px] text-fg-60">Color</label>
+            <div className="relative flex items-center bg-bk-40 rounded border border-bd-50 hover:border-bd-55 focus-within:border-ac-01 h-[26px]">
+              {/* Color Picker as Icon */}
+              <div className="relative flex items-center justify-center shrink-0 pl-1.5 pr-1">
+                <input
+                  type="color"
+                  value={modelState.backgroundColor}
+                  onChange={(e) =>
+                    handleBackgroundChange(e.target.value, "custom")
+                  }
+                  className="w-[14px] h-[14px] rounded cursor-pointer"
+                  style={{
+                    appearance: "none",
+                    WebkitAppearance: "none",
+                    MozAppearance: "none",
+                    backgroundColor: modelState.backgroundColor,
+                    border: "none",
+                    outline: "none",
+                    padding: 0,
+                  }}
+                />
+              </div>
+
+              {/* Text Input */}
               <input
                 type="text"
                 value={modelState.backgroundColor}
                 onChange={(e) =>
                   handleBackgroundChange(e.target.value, "custom")
                 }
-                className="flex-1 text-[11px] bg-bk-40 text-fg-50 rounded px-2 py-1.5 border border-bd-50"
+                className="flex-1 h-full min-w-0 bg-transparent text-fg-50 text-[11px] font-normal transition-none! focus:outline-none pr-2"
               />
             </div>
           </div>

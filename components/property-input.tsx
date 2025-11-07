@@ -103,17 +103,17 @@ export const PropertyInput: React.FC<PropertyInputProps> = ({
   };
 
   return (
-    <div className="relative flex items-center">
-      <div className="relative flex-1">
+    <div className="relative">
+      <div className="relative flex items-center bg-bk-40 rounded border border-bd-50 hover:border-bd-55 focus-within:border-ac-01 h-[26px]">
         {/* Icon or Label */}
         {(icon || label) && (
-          <div className="absolute left-2 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none z-10">
+          <div className="flex items-center justify-center shrink-0 pl-1.5 pr-1 pointer-events-none">
             {icon ? (
-              <span className="text-fg-60 flex items-center justify-center">
+              <span className="text-fg-60 flex items-center justify-center w-[14px]">
                 {icon}
               </span>
             ) : (
-              <span className="text-fg-60 text-[11px] font-medium flex items-center justify-center">
+              <span className="text-fg-60 text-[11px] font-medium">
                 {label}
               </span>
             )}
@@ -131,14 +131,12 @@ export const PropertyInput: React.FC<PropertyInputProps> = ({
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           className={`
-            w-full h-[26px] 
-            bg-bk-40 text-fg-50 
-            rounded border border-bd-50 
+            flex-1 h-full min-w-0
+            bg-transparent text-fg-50 
             text-[11px] font-normal
-            !transition-none
-            focus:outline-none focus:border-ac-01
-            hover:border-bd-55
-            ${icon || label ? "pl-6" : "pl-2"}
+            transition-none!
+            focus:outline-none
+            ${icon || label ? "pl-0" : "pl-2"}
             pr-2
           `}
         />

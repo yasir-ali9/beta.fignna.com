@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useCallback } from "react";
 import * as THREE from "three";
 import { observer } from "mobx-react-lite";
 import { useEditorEngine } from "@/lib/stores/editor/hooks";
@@ -23,6 +23,12 @@ export const ThreeDNodeRenderer = observer(
         // Store ref globally for export (temporary solution)
         (window as any).__current3DModel = modelRef.current;
       }
+      return () => {
+        // Clean up on unmount
+        if ((window as any).__current3DModel === modelRef.current) {
+          delete (window as any).__current3DModel;
+        }
+      };
     }, [modelRef.current]);
 
     const [isRotating, setIsRotating] = useState(false);
@@ -32,14 +38,18 @@ export const ThreeDNodeRenderer = observer(
       rotation: 0,
     });
 
-    const handleRotateStart = (e: { clientX: number }) => {
-      setIsRotating(true);
-      setRotationStart({
-        x: e.clientX,
-        y: 0,
-        rotation: modelState.modelRotationY,
-      });
-    };
+    // Use useCallback to prevent recreation on every render
+    const handleRotateStart = useCallback(
+      (e: { clientX: number }) => {
+        setIsRotating(true);
+        setRotationStart({
+          x: e.clientX,
+          y: 0,
+          rotation: modelState.modelRotationY,
+        });
+      },
+      [modelState.modelRotationY]
+    );
 
     // Store rotation handler globally so canvas can access it
     useEffect(() => {
@@ -47,31 +57,54 @@ export const ThreeDNodeRenderer = observer(
       return () => {
         delete (window as any)[`__rotateHandler_${node.id}`];
       };
-    }, [node.id, modelState.modelRotationY]);
+    }, [node.id, handleRotateStart]);
 
     useEffect(() => {
       if (!isRotating) return;
 
+      let rafId: number | null = null;
+      let lastRotation = rotationStart.rotation;
+
       const handleRotateMove = (e: MouseEvent) => {
         const deltaX = e.clientX - rotationStart.x;
         const newRotation = rotationStart.rotation + (deltaX * Math.PI) / 180;
+        lastRotation = newRotation;
 
-        // Update rotation only - don't change frame size
-        editorEngine.threed.updateModelState(node.id, {
-          modelRotationY: newRotation,
+        // Cancel previous frame if it hasn't executed yet
+        if (rafId !== null) {
+          cancelAnimationFrame(rafId);
+        }
+
+        // Use requestAnimationFrame for smooth 60fps updates
+        rafId = requestAnimationFrame(() => {
+          // Use optimized rotation update method
+          editorEngine.threed.updateRotation(node.id, lastRotation);
+          rafId = null;
         });
       };
 
       const handleRotateEnd = () => {
+        // Cancel any pending animation frame
+        if (rafId !== null) {
+          cancelAnimationFrame(rafId);
+          rafId = null;
+        }
+        // Apply final rotation value
+        editorEngine.threed.updateRotation(node.id, lastRotation);
         setIsRotating(false);
       };
 
-      document.addEventListener("mousemove", handleRotateMove);
-      document.addEventListener("mouseup", handleRotateEnd);
+      // Use capture phase to ensure we catch the events
+      document.addEventListener("mousemove", handleRotateMove, true);
+      document.addEventListener("mouseup", handleRotateEnd, true);
 
       return () => {
-        document.removeEventListener("mousemove", handleRotateMove);
-        document.removeEventListener("mouseup", handleRotateEnd);
+        // Clean up listeners and cancel any pending animation frame
+        if (rafId !== null) {
+          cancelAnimationFrame(rafId);
+        }
+        document.removeEventListener("mousemove", handleRotateMove, true);
+        document.removeEventListener("mouseup", handleRotateEnd, true);
       };
     }, [isRotating, rotationStart, node.id, editorEngine]);
 
@@ -113,6 +146,9 @@ export const ThreeDNodeRenderer = observer(
           modelRef={modelRef}
           nodeWidth={node.width}
           nodeHeight={node.height}
+          useEnvironment={modelState.useEnvironment}
+          environmentPreset={modelState.environmentPreset}
+          customHdriUrl={modelState.customHdriUrl || undefined}
         />
       </>
     );

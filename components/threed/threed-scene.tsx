@@ -1,11 +1,12 @@
 "use client";
 
-import { useRef, useEffect, Suspense, useState } from "react";
+import { useRef, useEffect, Suspense, useState, useMemo } from "react";
 import * as THREE from "three";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { EffectComposer, Bloom } from "@react-three/postprocessing";
 import { SVGModel } from "./svg-model";
+import { SimpleEnvironment } from "./environment-presets";
 import { observer } from "mobx-react-lite";
 
 interface ThreeDSceneProps {
@@ -32,6 +33,9 @@ interface ThreeDSceneProps {
   modelRef?: React.RefObject<THREE.Group | null>;
   nodeWidth: number;
   nodeHeight: number;
+  useEnvironment?: boolean;
+  environmentPreset?: string;
+  customHdriUrl?: string;
 }
 
 export const ThreeDScene = observer(
@@ -59,11 +63,28 @@ export const ThreeDScene = observer(
     modelRef: externalModelRef,
     nodeWidth,
     nodeHeight,
+    useEnvironment = false,
+    environmentPreset = "sunset",
+    customHdriUrl,
   }: ThreeDSceneProps) => {
     const modelGroupRef = useRef<THREE.Group | null>(null);
     const internalModelRef = useRef<THREE.Group | null>(null);
     const modelRef = externalModelRef || internalModelRef;
     const cameraRef = useRef<THREE.Camera | null>(null);
+
+    // Memoize environment to avoid unnecessary re-renders
+    const environment = useMemo(() => {
+      if (!useEnvironment) return null;
+
+      return (
+        <Suspense fallback={null}>
+          <SimpleEnvironment
+            environmentPreset={environmentPreset}
+            customHdriUrl={customHdriUrl}
+          />
+        </Suspense>
+      );
+    }, [useEnvironment, environmentPreset, customHdriUrl]);
 
     if (!svgData) {
       return (
@@ -110,6 +131,9 @@ export const ThreeDScene = observer(
             castShadow={false}
           />
 
+          {/* Environment Lighting */}
+          {environment}
+
           <group ref={modelGroupRef} rotation={[0, modelRotationY, 0]}>
             <Suspense fallback={null}>
               <SVGModel
@@ -124,7 +148,7 @@ export const ThreeDScene = observer(
                 metalness={metalness}
                 clearcoat={clearcoat}
                 transmission={transmission}
-                envMapIntensity={envMapIntensity}
+                envMapIntensity={useEnvironment ? envMapIntensity : 0.2}
                 receiveShadow={false}
                 castShadow={false}
                 ref={modelRef}

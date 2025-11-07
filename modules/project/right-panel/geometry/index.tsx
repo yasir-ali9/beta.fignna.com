@@ -2,11 +2,17 @@
 
 import { useEditorEngine } from "@/lib/stores/editor/hooks";
 import { observer } from "mobx-react-lite";
-import { useState, useEffect } from "react";
-import { Slider } from "@/components/slider";
+import { useEffect, useState } from "react";
 import { PlusIcon, MinusIcon } from "@/components/icons/common";
-import { SVGUpload } from "@/components/threed/svg-upload";
 import { BEVEL_PRESETS } from "@/lib/stores/editor/threed";
+import { PropertyInput } from "@/components/property-input";
+import {
+  DepthIcon,
+  ThicknessIcon,
+  RoundnessIcon,
+  SmoothnessIcon,
+} from "@/components/icons/right";
+import { Tooltip } from "@/components/tooltip";
 
 export const Geometry = observer(() => {
   const [isExpanded, setIsExpanded] = useState(true);
@@ -116,92 +122,180 @@ export const Geometry = observer(() => {
 
       {/* Section Content */}
       {isExpanded && (
-        <div className="px-3 pb-3 space-y-3">
-          {/* SVG Upload */}
-          <SVGUpload
-            onUpload={handleSVGUpload}
-            currentFileName={modelState.fileName}
-          />
+        <div className="px-3 pb-2 space-y-1">
+          {/* SVG Upload - Minimal Design */}
+          <div className="space-y-1">
+            <label className="text-[10px] text-fg-60">Upload</label>
+            <button
+              onClick={() => {
+                const input = document.createElement("input");
+                input.type = "file";
+                input.accept = ".svg,image/svg+xml";
+                input.onchange = (e) => {
+                  const file = (e.target as HTMLInputElement).files?.[0];
+                  if (!file) return;
 
-          {/* Depth/Thickness */}
-          <Slider
-            label="Thickness"
-            value={modelState.depth}
-            min={0.1}
-            max={50}
-            step={0.1}
-            onChange={handleDepthChange}
-          />
+                  if (file.type !== "image/svg+xml") {
+                    alert("Please upload an SVG file");
+                    return;
+                  }
 
-          {/* Bevel Presets */}
-          <div className="space-y-2">
-            <label className="text-[11px] text-fg-60">Bevel Style</label>
-            <div className="grid grid-cols-5 gap-1">
-              {BEVEL_PRESETS.map((preset) => (
-                <button
-                  key={preset.name}
-                  onClick={() => handleBevelPresetChange(preset.name)}
-                  className={`
-                    text-[10px] py-1.5 rounded transition-colors
-                    ${
-                      modelState.bevelPreset === preset.name
-                        ? "bg-bk-20 text-fg-30 border border-fg-40"
-                        : "bg-bk-40 text-fg-60 hover:bg-bk-30 hover:text-fg-50"
+                  const reader = new FileReader();
+                  reader.onload = (event) => {
+                    const svgData = event.target?.result as string;
+                    if (svgData) {
+                      handleSVGUpload(svgData, file.name);
                     }
-                  `}
-                >
-                  {preset.label}
-                </button>
-              ))}
+                  };
+                  reader.readAsText(file);
+                };
+                input.click();
+              }}
+              className="w-full h-[26px] flex items-center justify-between bg-bk-40 rounded border border-bd-50 hover:border-bd-55 px-2 transition-colors group"
+            >
+              <div className="flex items-center gap-2">
+                {/* SVG Preview */}
+                {modelState.svgData ? (
+                  <div
+                    className="w-[14px] h-[14px] flex items-center justify-center shrink-0 [&>svg]:w-full [&>svg]:h-full [&>svg]:fill-fg-50"
+                    dangerouslySetInnerHTML={{ __html: modelState.svgData }}
+                  />
+                ) : (
+                  <div className="w-[14px] h-[14px] flex items-center justify-center shrink-0 bg-bk-50 rounded">
+                    <span className="text-[8px] text-fg-60">?</span>
+                  </div>
+                )}
+                <span className="text-[11px] text-fg-50">
+                  {modelState.fileName?.replace(".svg", "") || "No file"}
+                </span>
+              </div>
+              <span className="text-[10px] text-fg-60 group-hover:text-fg-50 transition-colors">
+                Replace
+              </span>
+            </button>
+          </div>
+
+          {/* Depth and Presets in same row */}
+          <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,2fr)] gap-1">
+            {/* Depth Input - Showing "Thickness" as "Depth" to user */}
+            <div className="space-y-1 min-w-0">
+              <label className="text-[10px] text-fg-60">Depth</label>
+              <PropertyInput
+                icon={<DepthIcon size={16} />}
+                value={modelState.depth}
+                onChange={handleDepthChange}
+                min={0.1}
+                max={50}
+                step={0.1}
+              />
+            </div>
+
+            {/* Bevel Presets - Redesigned like Environment */}
+            <div className="space-y-1 min-w-0">
+              <label className="text-[10px] text-fg-60">Presets</label>
+              <div className="grid grid-cols-4 gap-1 min-w-0">
+                {BEVEL_PRESETS.filter((p) => p.name !== "custom").map(
+                  (preset) => {
+                    // Calculate border radius based on preset
+                    const radiusMap: Record<string, string> = {
+                      none: "0%",
+                      light: "20%",
+                      medium: "35%",
+                      heavy: "50%",
+                    };
+                    const radius = radiusMap[preset.name] || "0%";
+
+                    return (
+                      <Tooltip
+                        key={preset.name}
+                        content={preset.label}
+                        position="top"
+                      >
+                        <button
+                          onClick={() => handleBevelPresetChange(preset.name)}
+                          className={`
+                            relative overflow-hidden rounded transition-all h-6 w-full
+                            ${
+                              modelState.bevelPreset === preset.name
+                                ? "bg-bk-30 ring-1 ring-bd-50"
+                                : "bg-bk-40 hover:bg-bk-30"
+                            }
+                          `}
+                        >
+                          <div
+                            className="absolute bottom-0 left-0 w-[70%] h-[70%] bg-fg-60"
+                            style={{
+                              borderTopRightRadius: radius,
+                            }}
+                          />
+                        </button>
+                      </Tooltip>
+                    );
+                  }
+                )}
+              </div>
             </div>
           </div>
 
-          {/* Custom Bevel Controls - only show if custom preset */}
-          {modelState.bevelEnabled && modelState.bevelPreset === "custom" && (
-            <>
-              <Slider
-                label="Bevel Thickness"
-                value={modelState.bevelThickness}
-                min={0}
-                max={3}
-                step={0.1}
-                onChange={(value) =>
-                  editorEngine.threed.updateModelState(selectedNode.id, {
-                    bevelThickness: value,
-                  })
-                }
-              />
+          {/* Thickness, Roundness, Smoothness in one row - Always show when bevel is enabled */}
+          {modelState.bevelEnabled && (
+            <div className="space-y-1">
+              {/* Labels Row */}
+              <div className="grid grid-cols-3 gap-1">
+                <label className="text-[10px] text-fg-60">Thickness</label>
+                <label className="text-[10px] text-fg-60">Roundness</label>
+                <label className="text-[10px] text-fg-60">Smoothness</label>
+              </div>
 
-              <Slider
-                label="Bevel Size"
-                value={modelState.bevelSize}
-                min={0}
-                max={2}
-                step={0.1}
-                onChange={(value) =>
-                  editorEngine.threed.updateModelState(selectedNode.id, {
-                    bevelSize: value,
-                  })
-                }
-              />
+              {/* Inputs Row */}
+              <div className="grid grid-cols-3 gap-1">
+                {/* Thickness - Showing "Bevel Thickness" as "Thickness" to user */}
+                <PropertyInput
+                  icon={<ThicknessIcon size={14} />}
+                  value={modelState.bevelThickness}
+                  onChange={(value) =>
+                    editorEngine.threed.updateModelState(selectedNode.id, {
+                      bevelThickness: value,
+                    })
+                  }
+                  min={0}
+                  max={3}
+                  step={0.1}
+                />
 
-              <Slider
-                label="Bevel Quality"
-                value={modelState.bevelSegments}
-                min={1}
-                max={10}
-                step={1}
-                onChange={(value) =>
-                  editorEngine.threed.updateModelState(selectedNode.id, {
-                    bevelSegments: value,
-                  })
-                }
-              />
-            </>
+                {/* Roundness - Showing "Bevel Size" as "Roundness" to user */}
+                <PropertyInput
+                  icon={<RoundnessIcon size={14} />}
+                  value={modelState.bevelSize}
+                  onChange={(value) =>
+                    editorEngine.threed.updateModelState(selectedNode.id, {
+                      bevelSize: value,
+                    })
+                  }
+                  min={0}
+                  max={2}
+                  step={0.1}
+                />
+
+                {/* Smoothness - Showing "Bevel Quality" as "Smoothness" to user */}
+                <PropertyInput
+                  icon={<SmoothnessIcon size={14} />}
+                  value={modelState.bevelSegments}
+                  onChange={(value) =>
+                    editorEngine.threed.updateModelState(selectedNode.id, {
+                      bevelSegments: value,
+                    })
+                  }
+                  min={1}
+                  max={10}
+                  step={1}
+                />
+              </div>
+            </div>
           )}
 
           {/* Auto-rotate */}
-          <div className="flex items-center gap-2 pt-2 border-t border-bd-50">
+          <div className="flex items-center gap-2 pt-2">
             <input
               type="checkbox"
               id="autoRotate"
@@ -211,29 +305,117 @@ export const Geometry = observer(() => {
                   autoRotate: e.target.checked,
                 })
               }
-              className="w-3 h-3 rounded"
+              className="w-3.5 h-3.5 rounded accent-fg-50 cursor-pointer"
             />
-            <label htmlFor="autoRotate" className="text-[11px] text-fg-60">
+            <label
+              htmlFor="autoRotate"
+              className="text-[11px] text-fg-60 cursor-pointer"
+            >
               Auto-rotate model
             </label>
           </div>
 
           {modelState.autoRotate && (
-            <Slider
-              label="Rotation Speed"
-              value={modelState.autoRotateSpeed}
-              min={1}
-              max={10}
-              step={0.5}
-              onChange={(value) =>
-                editorEngine.threed.updateModelState(selectedNode.id, {
-                  autoRotateSpeed: value,
-                })
-              }
-            />
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] text-fg-60 w-20 shrink-0">
+                Speed
+              </span>
+              <div className="flex-1 flex items-center gap-2 bg-bk-40 rounded border border-bd-50 px-2 py-1">
+                <div className="relative flex-1">
+                  <div className="w-full h-1 bg-bk-50 rounded-lg relative">
+                    <div
+                      className="h-full bg-fg-50 rounded-lg transition-all duration-150"
+                      style={{
+                        width: `${
+                          ((modelState.autoRotateSpeed - 1) / 9) * 100
+                        }%`,
+                      }}
+                    />
+                  </div>
+                  <input
+                    type="range"
+                    min={1}
+                    max={10}
+                    step={0.5}
+                    value={modelState.autoRotateSpeed}
+                    onChange={(e) =>
+                      editorEngine.threed.updateModelState(selectedNode.id, {
+                        autoRotateSpeed: parseFloat(e.target.value),
+                      })
+                    }
+                    className="absolute top-0 w-full h-1 appearance-none cursor-pointer slider-custom bg-transparent"
+                  />
+                </div>
+                <span className="text-[10px] text-fg-50 w-8 text-right">
+                  {modelState.autoRotateSpeed.toFixed(1)}
+                </span>
+              </div>
+            </div>
           )}
         </div>
       )}
+
+      <style jsx>{`
+        .slider-custom::-webkit-slider-thumb {
+          appearance: none;
+          height: 10px;
+          width: 10px;
+          border-radius: 50%;
+          background: white;
+          cursor: pointer;
+          border: 1px solid var(--bd-50);
+          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+          transition: all 0.15s ease;
+        }
+
+        .slider-custom::-webkit-slider-thumb:hover {
+          transform: scale(1.1);
+        }
+
+        .slider-custom::-webkit-slider-thumb:active {
+          transform: scale(1.15);
+        }
+
+        .slider-custom::-moz-range-thumb {
+          height: 10px;
+          width: 10px;
+          border-radius: 50%;
+          background: white;
+          cursor: pointer;
+          border: 1px solid var(--bd-50);
+          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+          transition: all 0.15s ease;
+        }
+
+        .slider-custom::-moz-range-thumb:hover {
+          transform: scale(1.1);
+        }
+
+        .slider-custom::-moz-range-thumb:active {
+          transform: scale(1.15);
+        }
+
+        .slider-custom::-webkit-slider-track {
+          height: 4px;
+          background: transparent;
+          border-radius: 2px;
+        }
+
+        .slider-custom::-moz-range-track {
+          height: 4px;
+          background: transparent;
+          border-radius: 2px;
+          border: none;
+        }
+
+        .slider-custom:focus {
+          outline: none;
+        }
+
+        .slider-custom::-moz-focus-outer {
+          border: 0;
+        }
+      `}</style>
     </div>
   );
 });

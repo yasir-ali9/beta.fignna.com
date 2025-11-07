@@ -75,42 +75,41 @@ export const Export = observer(() => {
 
       {/* Section Content */}
       {isExpanded && (
-        <div className="px-3 pb-3 space-y-3">
+        <div className="px-3 pb-2 space-y-2">
+          {/* 💡 Tip: Use STL for 3D printing, GLB for games/AR, PNG for presentations */}
+
           {/* Export 3D Models */}
-          <div className="space-y-2">
-            <label className="text-[11px] text-fg-60">Export 3D Model</label>
-            <div className="grid grid-cols-3 gap-2">
+          <div className="space-y-1">
+            <label className="text-[10px] text-fg-60">3D Model</label>
+            <div className="grid grid-cols-3 gap-1">
               <button
                 onClick={() => handleExportClick("stl")}
                 disabled={isExporting}
-                className="text-[10px] py-2 rounded transition-colors bg-bk-40 text-fg-50 hover:bg-bk-30 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="h-[26px] text-[11px] rounded transition-colors bg-bk-40 text-fg-50 hover:bg-bk-30 border border-bd-50 hover:border-bd-55 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isExporting ? "..." : "STL"}
               </button>
               <button
                 onClick={() => handleExportClick("glb")}
                 disabled={isExporting}
-                className="text-[10px] py-2 rounded transition-colors bg-bk-40 text-fg-50 hover:bg-bk-30 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="h-[26px] text-[11px] rounded transition-colors bg-bk-40 text-fg-50 hover:bg-bk-30 border border-bd-50 hover:border-bd-55 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isExporting ? "..." : "GLB"}
               </button>
               <button
                 onClick={() => handleExportClick("gltf")}
                 disabled={isExporting}
-                className="text-[10px] py-2 rounded transition-colors bg-bk-40 text-fg-50 hover:bg-bk-30 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="h-[26px] text-[11px] rounded transition-colors bg-bk-40 text-fg-50 hover:bg-bk-30 border border-bd-50 hover:border-bd-55 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isExporting ? "..." : "GLTF"}
               </button>
             </div>
-            <p className="text-[9px] text-fg-70 leading-relaxed">
-              STL for 3D printing, GLB/GLTF for 3D apps
-            </p>
           </div>
 
           {/* Export Images */}
-          <div className="space-y-2 pt-2 border-t border-bd-50">
-            <label className="text-[11px] text-fg-60">Export Image</label>
-            <div className="grid grid-cols-3 gap-2">
+          <div className="space-y-1">
+            <label className="text-[10px] text-fg-60">Image</label>
+            <div className="grid grid-cols-3 gap-1">
               {PNG_RESOLUTIONS.map((resolution) => (
                 <button
                   key={resolution.multiplier}
@@ -118,23 +117,12 @@ export const Export = observer(() => {
                     handleExportClick("png", resolution.multiplier)
                   }
                   disabled={isExporting}
-                  className="text-[10px] py-2 rounded transition-colors bg-bk-40 text-fg-50 hover:bg-bk-30 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="h-[26px] text-[11px] rounded transition-colors bg-bk-40 text-fg-50 hover:bg-bk-30 border border-bd-50 hover:border-bd-55 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isExporting ? "..." : resolution.label.split(" ")[0]}
                 </button>
               ))}
             </div>
-            <p className="text-[9px] text-fg-70 leading-relaxed">
-              Low (1x), Medium (2x), High (3x) quality
-            </p>
-          </div>
-
-          {/* Info */}
-          <div className="bg-bk-40 border border-bd-50 rounded p-2 mt-2">
-            <p className="text-[10px] text-fg-60 leading-relaxed">
-              💡 Tip: Use STL for 3D printing, GLB for games/AR, PNG for
-              presentations
-            </p>
           </div>
         </div>
       )}

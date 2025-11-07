@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, ReactNode } from "react";
+import { createPortal } from "react-dom";
 
 export type TooltipPosition =
   | "top"
@@ -31,12 +32,25 @@ export function Tooltip({
 }: TooltipProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
+  const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = useState(false);
+
+  const updateTooltipPosition = () => {
+    if (containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect();
+      setTooltipPosition({
+        top: rect.top,
+        left: rect.left,
+      });
+    }
+  };
 
   const handleMouseEnter = () => {
     if (disabled) return;
 
+    updateTooltipPosition();
     setIsVisible(true);
     timeoutRef.current = setTimeout(() => {
       setShowTooltip(true);
@@ -52,6 +66,7 @@ export function Tooltip({
   };
 
   useEffect(() => {
+    setMounted(true);
     return () => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
@@ -59,71 +74,156 @@ export function Tooltip({
     };
   }, []);
 
-  const getTooltipClasses = () => {
-    const baseClasses = `
-      absolute z-[200] px-2 py-1 text-[11px] font-normal text-fg-30 bg-bk-30 border border-bd-50 
-      rounded-md shadow-sm backdrop-blur-sm pointer-events-none transition-opacity duration-200
-      whitespace-nowrap
-    `;
+  useEffect(() => {
+    if (isVisible) {
+      updateTooltipPosition();
+      const handleScroll = () => updateTooltipPosition();
+      window.addEventListener("scroll", handleScroll, true);
+      return () => window.removeEventListener("scroll", handleScroll, true);
+    }
+  }, [isVisible]);
 
-    const positionClasses = {
-      top: "bottom-full left-1/2 transform -translate-x-1/2 mb-2",
-      bottom: "top-full left-1/2 transform -translate-x-1/2 mt-2",
-      left: "right-full top-1/2 transform -translate-y-1/2 mr-2",
-      right: "left-full top-1/2 transform -translate-y-1/2 ml-2",
-      "top-left": "bottom-full right-0 mb-2",
-      "top-right": "bottom-full left-0 mb-2",
-      "bottom-left": "top-full right-0 mt-2",
-      "bottom-right": "top-full left-0 mt-2",
+  const getTooltipStyle = () => {
+    if (!containerRef.current) return {};
+
+    const rect = containerRef.current.getBoundingClientRect();
+    const tooltipOffset = 6;
+    const padding = 8; // Padding from viewport edges
+
+    // Estimate tooltip dimensions (will be adjusted by browser)
+    const estimatedTooltipWidth = content.length * 7; // Rough estimate
+    const estimatedTooltipHeight = 32;
+
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+
+    let finalPosition: TooltipPosition = position;
+
+    // Smart positioning based on available space
+    const spaceAbove = rect.top;
+    const spaceBelow = viewportHeight - rect.bottom;
+    const spaceLeft = rect.left;
+    const spaceRight = viewportWidth - rect.right;
+
+    // Auto-adjust position if tooltip would go off-screen
+    if (
+      position === "top" &&
+      spaceAbove < estimatedTooltipHeight + tooltipOffset + padding
+    ) {
+      finalPosition = "bottom" as TooltipPosition;
+    } else if (
+      position === "bottom" &&
+      spaceBelow < estimatedTooltipHeight + tooltipOffset + padding
+    ) {
+      finalPosition = "top" as TooltipPosition;
+    } else if (
+      position === "left" &&
+      spaceLeft < estimatedTooltipWidth + tooltipOffset + padding
+    ) {
+      finalPosition = "right" as TooltipPosition;
+    } else if (
+      position === "right" &&
+      spaceRight < estimatedTooltipWidth + tooltipOffset + padding
+    ) {
+      finalPosition = "left" as TooltipPosition;
+    }
+
+    const positions: Record<
+      TooltipPosition,
+      { top: number; left: number; transform: string }
+    > = {
+      top: {
+        top: rect.top - tooltipOffset,
+        left: Math.max(
+          padding,
+          Math.min(rect.left + rect.width / 2, viewportWidth - padding)
+        ),
+        transform: "translate(-50%, -100%)",
+      },
+      bottom: {
+        top: rect.bottom + tooltipOffset,
+        left: Math.max(
+          padding,
+          Math.min(rect.left + rect.width / 2, viewportWidth - padding)
+        ),
+        transform: "translate(-50%, 0)",
+      },
+      left: {
+        top: rect.top + rect.height / 2,
+        left: rect.left - tooltipOffset,
+        transform: "translate(-100%, -50%)",
+      },
+      right: {
+        top: rect.top + rect.height / 2,
+        left: rect.right + tooltipOffset,
+        transform: "translate(0, -50%)",
+      },
+      "top-left": {
+        top: rect.top - tooltipOffset,
+        left: rect.right,
+        transform: "translate(0, -100%)",
+      },
+      "top-right": {
+        top: rect.top - tooltipOffset,
+        left: rect.left,
+        transform: "translate(0, -100%)",
+      },
+      "bottom-left": {
+        top: rect.bottom + tooltipOffset,
+        left: rect.right,
+        transform: "translate(0, 0)",
+      },
+      "bottom-right": {
+        top: rect.bottom + tooltipOffset,
+        left: rect.left,
+        transform: "translate(0, 0)",
+      },
     };
 
-    return `${baseClasses} ${positionClasses[position]} ${
-      showTooltip ? "opacity-100" : "opacity-0"
-    }`;
+    const style = positions[finalPosition];
+
+    // Additional horizontal constraint for centered tooltips
+    if (finalPosition === "top" || finalPosition === "bottom") {
+      const halfWidth = estimatedTooltipWidth / 2;
+      if (style.left - halfWidth < padding) {
+        style.left = halfWidth + padding;
+      } else if (style.left + halfWidth > viewportWidth - padding) {
+        style.left = viewportWidth - halfWidth - padding;
+      }
+    }
+
+    return style;
   };
 
-  const getArrowClasses = () => {
-    const arrowClasses = {
-      top: "top-full left-1/2 transform -translate-x-1/2 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-bk-30 drop-shadow-sm",
-      bottom:
-        "bottom-full left-1/2 transform -translate-x-1/2 border-l-4 border-r-4 border-b-4 border-l-transparent border-r-transparent border-b-bk-30 drop-shadow-sm",
-      left: "left-full top-1/2 transform -translate-y-1/2 border-t-4 border-b-4 border-l-4 border-t-transparent border-b-transparent border-l-bk-30 drop-shadow-sm",
-      right:
-        "right-full top-1/2 transform -translate-y-1/2 border-t-4 border-b-4 border-r-4 border-t-transparent border-b-transparent border-r-bk-30 drop-shadow-sm",
-      "top-left":
-        "top-full right-2 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-bk-30 drop-shadow-sm",
-      "top-right":
-        "top-full left-2 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-bk-30 drop-shadow-sm",
-      "bottom-left":
-        "bottom-full right-2 border-l-4 border-r-4 border-b-4 border-l-transparent border-r-transparent border-b-bk-30 drop-shadow-sm",
-      "bottom-right":
-        "bottom-full left-2 border-l-4 border-r-4 border-b-4 border-l-transparent border-r-transparent border-b-bk-30 drop-shadow-sm",
-    };
-
-    return `absolute ${arrowClasses[position]} ${
-      showTooltip ? "opacity-100" : "opacity-0"
-    } transition-opacity duration-200`;
+  const getTooltipClasses = () => {
+    return `
+      fixed z-[9999] px-2 py-1 text-[11px] font-normal text-fg-30 bg-bk-30 border border-bd-50 
+      rounded-md shadow-sm backdrop-blur-sm pointer-events-none transition-opacity duration-200
+      whitespace-nowrap ${showTooltip ? "opacity-100" : "opacity-0"}
+    `;
   };
 
   if (disabled || !content) {
     return <>{children}</>;
   }
 
-  return (
-    <div
-      ref={containerRef}
-      className={`relative inline-block ${className}`}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-    >
-      {children}
-
-      {isVisible && (
-        <div className={getTooltipClasses()}>
-          {content}
-          <div className={getArrowClasses()} />
-        </div>
-      )}
+  const tooltipContent = isVisible && mounted && (
+    <div className={getTooltipClasses()} style={getTooltipStyle()}>
+      {content}
     </div>
+  );
+
+  return (
+    <>
+      <div
+        ref={containerRef}
+        className={`relative inline-block ${className}`}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
+        {children}
+      </div>
+      {mounted && createPortal(tooltipContent, document.body)}
+    </>
   );
 }

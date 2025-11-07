@@ -3,9 +3,10 @@
 import { useEditorEngine } from "@/lib/stores/editor/hooks";
 import { observer } from "mobx-react-lite";
 import { useState } from "react";
-import { Slider } from "@/components/slider";
 import { PlusIcon, MinusIcon } from "@/components/icons/common";
 import { MATERIAL_PRESETS } from "@/lib/stores/editor/threed";
+import { PropertyInput } from "@/components/property-input";
+import { Tooltip } from "@/components/tooltip";
 
 export const Material = observer(() => {
   const [isExpanded, setIsExpanded] = useState(true);
@@ -64,51 +65,122 @@ export const Material = observer(() => {
 
       {/* Section Content */}
       {isExpanded && (
-        <div className="px-3 pb-3 space-y-3">
-          {/* Material Presets - Visual Buttons */}
-          <div className="space-y-2">
-            <label className="text-[11px] text-fg-60">Material Type</label>
+        <div className="px-3 pb-2 space-y-2">
+          {/* Material Presets - Redesigned like Environment */}
+          <div className="space-y-1">
+            <label className="text-[10px] text-fg-60">Presets</label>
             <div className="grid grid-cols-5 gap-2">
-              {MATERIAL_PRESETS.map((preset) => (
-                <button
-                  key={preset.name}
-                  onClick={() => handlePresetClick(preset.name)}
-                  className={`
-                    flex flex-col items-center p-2 rounded transition-colors
-                    ${
-                      modelState.materialPreset === preset.name
-                        ? "bg-bk-20 ring-1 ring-fg-40"
-                        : "bg-bk-40 hover:bg-bk-30"
-                    }
-                  `}
-                >
-                  <div
-                    className="w-10 h-10 rounded-full mb-1"
-                    style={{
-                      background: `linear-gradient(135deg, 
-                        hsl(210, ${100 - preset.roughness * 100}%, ${
-                        50 + preset.metalness * 30
-                      }%), 
-                        hsl(240, ${100 - preset.roughness * 80}%, ${
-                        20 + preset.metalness * 50
-                      }%))`,
-                      boxShadow:
-                        preset.clearcoat > 0
-                          ? "0 0 10px rgba(255,255,255,0.5) inset"
-                          : "none",
-                      opacity: preset.transmission > 0 ? 0.7 : 1,
-                    }}
-                  />
-                  <span className="text-[9px] text-fg-60 text-center leading-tight">
-                    {preset.label}
-                  </span>
-                </button>
-              ))}
+              {MATERIAL_PRESETS.filter((p) => p.name !== "custom").map(
+                (preset) => (
+                  <Tooltip
+                    key={preset.name}
+                    content={preset.label}
+                    position="top"
+                  >
+                    <button
+                      onClick={() => handlePresetClick(preset.name)}
+                      className={`
+                        relative overflow-hidden rounded transition-all h-6 w-full
+                        ${
+                          modelState.materialPreset === preset.name
+                            ? "bg-bk-30 ring-1 ring-bd-50"
+                            : "bg-bk-40 hover:bg-bk-30"
+                        }
+                      `}
+                    >
+                      <div
+                        className="absolute bottom-0 left-0 w-[70%] h-[70%]"
+                        style={{
+                          background: `linear-gradient(135deg, 
+                            hsl(210, ${100 - preset.roughness * 100}%, ${
+                            50 + preset.metalness * 30
+                          }%), 
+                            hsl(240, ${100 - preset.roughness * 80}%, ${
+                            20 + preset.metalness * 50
+                          }%))`,
+                          borderTopRightRadius: "40%",
+                          boxShadow:
+                            preset.clearcoat > 0
+                              ? "0 0 8px rgba(255,255,255,0.3) inset"
+                              : "none",
+                          opacity: preset.transmission > 0 ? 0.7 : 1,
+                        }}
+                      />
+                    </button>
+                  </Tooltip>
+                )
+              )}
+            </div>
+          </div>
+
+          {/* Material Properties - Always show */}
+          <div className="space-y-1">
+            {/* Labels Row */}
+            <div className="grid grid-cols-4 gap-1">
+              <label className="text-[10px] text-fg-60">Roughness</label>
+              <label className="text-[10px] text-fg-60">Metalness</label>
+              <label className="text-[10px] text-fg-60">Clearcoat</label>
+              <label className="text-[10px] text-fg-60">Transmission</label>
+            </div>
+
+            {/* Inputs Row */}
+            <div className="grid grid-cols-4 gap-1">
+              <PropertyInput
+                value={modelState.roughness}
+                onChange={(value) =>
+                  editorEngine.threed.updateModelState(selectedNode.id, {
+                    roughness: value,
+                    materialPreset: "custom",
+                  })
+                }
+                min={0}
+                max={1}
+                step={0.01}
+              />
+
+              <PropertyInput
+                value={modelState.metalness}
+                onChange={(value) =>
+                  editorEngine.threed.updateModelState(selectedNode.id, {
+                    metalness: value,
+                    materialPreset: "custom",
+                  })
+                }
+                min={0}
+                max={1}
+                step={0.01}
+              />
+
+              <PropertyInput
+                value={modelState.clearcoat}
+                onChange={(value) =>
+                  editorEngine.threed.updateModelState(selectedNode.id, {
+                    clearcoat: value,
+                    materialPreset: "custom",
+                  })
+                }
+                min={0}
+                max={1}
+                step={0.01}
+              />
+
+              <PropertyInput
+                value={modelState.transmission}
+                onChange={(value) =>
+                  editorEngine.threed.updateModelState(selectedNode.id, {
+                    transmission: value,
+                    materialPreset: "custom",
+                  })
+                }
+                min={0}
+                max={1}
+                step={0.01}
+              />
             </div>
           </div>
 
           {/* Color Override */}
-          <div className="flex items-center gap-2 pt-2 border-t border-bd-50">
+          <div className="flex items-center gap-2 pt-2">
             <input
               type="checkbox"
               id="useCustomColor"
@@ -118,18 +190,21 @@ export const Material = observer(() => {
                   useCustomColor: e.target.checked,
                 })
               }
-              className="w-3 h-3 rounded"
+              className="w-3.5 h-3.5 rounded accent-fg-50 cursor-pointer"
             />
-            <label htmlFor="useCustomColor" className="text-[11px] text-fg-60">
+            <label
+              htmlFor="useCustomColor"
+              className="text-[11px] text-fg-60 cursor-pointer"
+            >
               Override SVG colors
             </label>
           </div>
 
           {/* Custom Color Picker */}
           {modelState.useCustomColor && (
-            <div className="space-y-2">
-              <label className="text-[11px] text-fg-60">Custom Color</label>
-              <div className="flex items-center gap-2">
+            <div className="relative flex items-center bg-bk-40 rounded border border-bd-50 hover:border-bd-55 focus-within:border-ac-01 h-[26px]">
+              {/* Color Picker as Icon */}
+              <div className="relative flex items-center justify-center shrink-0 pl-1.5 pr-1">
                 <input
                   type="color"
                   value={modelState.customColor}
@@ -138,77 +213,31 @@ export const Material = observer(() => {
                       customColor: e.target.value,
                     })
                   }
-                  className="w-8 h-8 rounded cursor-pointer border border-bd-50"
-                />
-                <input
-                  type="text"
-                  value={modelState.customColor}
-                  onChange={(e) =>
-                    editorEngine.threed.updateModelState(selectedNode.id, {
-                      customColor: e.target.value,
-                    })
-                  }
-                  className="flex-1 text-[11px] bg-bk-40 text-fg-50 rounded px-2 py-1.5 border border-bd-50"
+                  className="w-[14px] h-[14px] rounded cursor-pointer"
+                  style={{
+                    appearance: "none",
+                    WebkitAppearance: "none",
+                    MozAppearance: "none",
+                    backgroundColor: modelState.customColor,
+                    border: "none",
+                    outline: "none",
+                    padding: 0,
+                  }}
                 />
               </div>
+
+              {/* Text Input */}
+              <input
+                type="text"
+                value={modelState.customColor}
+                onChange={(e) =>
+                  editorEngine.threed.updateModelState(selectedNode.id, {
+                    customColor: e.target.value,
+                  })
+                }
+                className="flex-1 h-full min-w-0 bg-transparent text-fg-50 text-[11px] font-normal transition-none! focus:outline-none pr-2"
+              />
             </div>
-          )}
-
-          {/* Custom Material Controls - only show if custom preset */}
-          {modelState.materialPreset === "custom" && (
-            <>
-              <Slider
-                label={`Roughness: ${modelState.roughness.toFixed(2)}`}
-                value={modelState.roughness * 100}
-                min={0}
-                max={100}
-                step={1}
-                onChange={(value) =>
-                  editorEngine.threed.updateModelState(selectedNode.id, {
-                    roughness: value / 100,
-                  })
-                }
-              />
-
-              <Slider
-                label={`Metalness: ${modelState.metalness.toFixed(2)}`}
-                value={modelState.metalness * 100}
-                min={0}
-                max={100}
-                step={1}
-                onChange={(value) =>
-                  editorEngine.threed.updateModelState(selectedNode.id, {
-                    metalness: value / 100,
-                  })
-                }
-              />
-
-              <Slider
-                label={`Clearcoat: ${modelState.clearcoat.toFixed(2)}`}
-                value={modelState.clearcoat * 100}
-                min={0}
-                max={100}
-                step={1}
-                onChange={(value) =>
-                  editorEngine.threed.updateModelState(selectedNode.id, {
-                    clearcoat: value / 100,
-                  })
-                }
-              />
-
-              <Slider
-                label={`Transmission: ${modelState.transmission.toFixed(2)}`}
-                value={modelState.transmission * 100}
-                min={0}
-                max={100}
-                step={1}
-                onChange={(value) =>
-                  editorEngine.threed.updateModelState(selectedNode.id, {
-                    transmission: value / 100,
-                  })
-                }
-              />
-            </>
           )}
         </div>
       )}

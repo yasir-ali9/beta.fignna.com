@@ -239,6 +239,14 @@ export class ThreeDManager {
     this.modelStates.set(nodeId, { ...currentState, ...updates });
   }
 
+  // Optimized method for frequent rotation updates (used during drag)
+  updateRotation(nodeId: string, rotation: number) {
+    const state = this.modelStates.get(nodeId);
+    if (state) {
+      state.modelRotationY = rotation;
+    }
+  }
+
   // Remove state when node is deleted
   removeModelState(nodeId: string) {
     this.modelStates.delete(nodeId);
