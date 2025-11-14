@@ -3,7 +3,7 @@
 import { LeftPanel } from "./left-panel";
 import { RightPanel } from "./right-panel";
 import { CentralArea } from "./central";
-import { ResizablePanel } from "@/components/resizable";
+import { ResizablePanel } from "@/components/reusables/resizable";
 import { observer } from "mobx-react-lite";
 
 interface ProjectEditorProps {

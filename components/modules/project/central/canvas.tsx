@@ -7,8 +7,8 @@ import { reaction } from "mobx";
 import { canvasManager } from "@/lib/canvas/manager";
 import { interactionsManager } from "@/lib/canvas/interactions";
 import { shortcutsManager } from "@/lib/shortcuts";
-import { ThreeDNodeRenderer } from "@/components/threed";
-import { RotateIcon } from "@/components/icons/canvas";
+import { ThreeDNodeRenderer } from "@/components/reusables/threed";
+import { RotateIcon } from "@/components/reusables/icons/canvas";
 
 const ZOOM_STEP = 0.05;
 const PAN_SENSITIVITY = 1;

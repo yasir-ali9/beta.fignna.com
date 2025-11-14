@@ -3,10 +3,10 @@
 import { useEditorEngine } from "@/lib/stores/editor/hooks";
 import { observer } from "mobx-react-lite";
 import { useState } from "react";
-import { PlusIcon, MinusIcon } from "@/components/icons/common";
+import { PlusIcon, MinusIcon } from "@/components/reusables/icons/common";
 import { MATERIAL_PRESETS } from "@/lib/stores/editor/threed";
-import { PropertyInput } from "@/components/property-input";
-import { Tooltip } from "@/components/tooltip";
+import { PropertyInput } from "@/components/reusables/property-input";
+import { Tooltip } from "@/components/reusables/tooltip";
 
 export const Material = observer(() => {
   const [isExpanded, setIsExpanded] = useState(true);
@@ -48,16 +48,14 @@ export const Material = observer(() => {
         className="w-full flex items-center justify-between px-3 py-2 transition-colors group"
       >
         <span
-          className={`text-[11.5px] font-normal transition-colors ${
-            isExpanded ? "text-fg-50" : "text-fg-60 group-hover:text-fg-50"
-          }`}
+          className={`text-[11.5px] font-normal transition-colors ${isExpanded ? "text-fg-50" : "text-fg-60 group-hover:text-fg-50"
+            }`}
         >
           Material
         </span>
         <span
-          className={`transition-colors ${
-            isExpanded ? "text-fg-50" : "text-fg-60 group-hover:text-fg-50"
-          }`}
+          className={`transition-colors ${isExpanded ? "text-fg-50" : "text-fg-60 group-hover:text-fg-50"
+            }`}
         >
           {isExpanded ? <MinusIcon size={12} /> : <PlusIcon size={12} />}
         </span>
@@ -81,10 +79,9 @@ export const Material = observer(() => {
                       onClick={() => handlePresetClick(preset.name)}
                       className={`
                         relative overflow-hidden rounded transition-all h-6 w-full
-                        ${
-                          modelState.materialPreset === preset.name
-                            ? "bg-bk-30 ring-1 ring-bd-50"
-                            : "bg-bk-40 hover:bg-bk-30"
+                        ${modelState.materialPreset === preset.name
+                          ? "bg-bk-30 ring-1 ring-bd-50"
+                          : "bg-bk-40 hover:bg-bk-30"
                         }
                       `}
                     >
@@ -92,12 +89,10 @@ export const Material = observer(() => {
                         className="absolute bottom-0 left-0 w-[70%] h-[70%]"
                         style={{
                           background: `linear-gradient(135deg, 
-                            hsl(210, ${100 - preset.roughness * 100}%, ${
-                            50 + preset.metalness * 30
-                          }%), 
-                            hsl(240, ${100 - preset.roughness * 80}%, ${
-                            20 + preset.metalness * 50
-                          }%))`,
+                            hsl(210, ${100 - preset.roughness * 100}%, ${50 + preset.metalness * 30
+                            }%), 
+                            hsl(240, ${100 - preset.roughness * 80}%, ${20 + preset.metalness * 50
+                            }%))`,
                           borderTopRightRadius: "40%",
                           boxShadow:
                             preset.clearcoat > 0

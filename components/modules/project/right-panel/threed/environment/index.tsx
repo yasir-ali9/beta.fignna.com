@@ -3,10 +3,10 @@
 import { useEditorEngine } from "@/lib/stores/editor/hooks";
 import { observer } from "mobx-react-lite";
 import { useRef } from "react";
-import { MinusIcon } from "@/components/icons/common";
-import { CustomImageIcon } from "@/components/icons/right";
+import { MinusIcon } from "@/components/reusables/icons/common";
+import { CustomImageIcon } from "@/components/reusables/icons/right";
 import { ENVIRONMENT_PRESETS } from "@/lib/stores/editor/threed";
-import { Tooltip } from "@/components/tooltip";
+import { Tooltip } from "@/components/reusables/tooltip";
 
 export const Environment = observer(() => {
   const editorEngine = useEditorEngine();
@@ -105,20 +105,18 @@ export const Environment = observer(() => {
         className="w-full flex items-center justify-between px-3 py-2 transition-colors group"
       >
         <span
-          className={`text-[11.5px] font-normal transition-colors ${
-            isEnvironmentEnabled
-              ? "text-fg-50"
-              : "text-fg-60 group-hover:text-fg-50"
-          }`}
+          className={`text-[11.5px] font-normal transition-colors ${isEnvironmentEnabled
+            ? "text-fg-50"
+            : "text-fg-60 group-hover:text-fg-50"
+            }`}
         >
           Environment
         </span>
         <span
-          className={`transition-colors ${
-            isEnvironmentEnabled
-              ? "text-fg-50"
-              : "text-fg-60 group-hover:text-fg-50"
-          }`}
+          className={`transition-colors ${isEnvironmentEnabled
+            ? "text-fg-50"
+            : "text-fg-60 group-hover:text-fg-50"
+            }`}
         >
           {isEnvironmentEnabled ? (
             <MinusIcon size={12} />
@@ -143,10 +141,9 @@ export const Environment = observer(() => {
                   }
                   className={`
                     relative overflow-hidden rounded-md transition-all h-6 w-full
-                    ${
-                      modelState.environmentPreset === preset.name
-                        ? "bg-bk-30 ring-1 ring-bd-50"
-                        : "bg-bk-40 hover:bg-bk-30"
+                    ${modelState.environmentPreset === preset.name
+                      ? "bg-bk-30 ring-1 ring-bd-50"
+                      : "bg-bk-40 hover:bg-bk-30"
                     }
                   `}
                 >
@@ -175,10 +172,9 @@ export const Environment = observer(() => {
                 }}
                 className={`
                   relative overflow-hidden rounded-md transition-all h-6 w-full
-                  ${
-                    modelState.environmentPreset === "custom"
-                      ? "bg-bk-30 ring-1 ring-bd-50"
-                      : "bg-bk-40 hover:bg-bk-35"
+                  ${modelState.environmentPreset === "custom"
+                    ? "bg-bk-30 ring-1 ring-bd-50"
+                    : "bg-bk-40 hover:bg-bk-35"
                   }
                 `}
               >
@@ -241,12 +237,11 @@ export const Environment = observer(() => {
               />
               <label
                 htmlFor="magicLight"
-                className={`text-[11px] transition-colors ${
-                  modelState.environmentPreset === "custom" &&
+                className={`text-[11px] transition-colors ${modelState.environmentPreset === "custom" &&
                   modelState.customHdriUrl
-                    ? "text-fg-70 cursor-not-allowed"
-                    : "text-fg-60 cursor-pointer"
-                }`}
+                  ? "text-fg-70 cursor-not-allowed"
+                  : "text-fg-60 cursor-pointer"
+                  }`}
               >
                 Magic Light
               </label>
@@ -266,9 +261,8 @@ export const Environment = observer(() => {
                         <div
                           className="h-full bg-fg-50 rounded-lg transition-all duration-150"
                           style={{
-                            width: `${
-                              ((modelState.bloomIntensity * 10 - 1) / 19) * 100
-                            }%`,
+                            width: `${((modelState.bloomIntensity * 10 - 1) / 19) * 100
+                              }%`,
                           }}
                         />
                       </div>
@@ -327,11 +321,10 @@ export const Environment = observer(() => {
                         <div
                           className="h-full bg-fg-50 rounded-lg transition-all duration-150"
                           style={{
-                            width: `${
-                              ((modelState.modelRotationY * (180 / Math.PI)) /
-                                360) *
+                            width: `${((modelState.modelRotationY * (180 / Math.PI)) /
+                              360) *
                               100
-                            }%`,
+                              }%`,
                           }}
                         />
                       </div>

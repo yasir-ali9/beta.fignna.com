@@ -3,16 +3,16 @@
 import { useEditorEngine } from "@/lib/stores/editor/hooks";
 import { observer } from "mobx-react-lite";
 import { useEffect, useState } from "react";
-import { PlusIcon, MinusIcon } from "@/components/icons/common";
+import { PlusIcon, MinusIcon } from "@/components/reusables/icons/common";
 import { BEVEL_PRESETS } from "@/lib/stores/editor/threed";
-import { PropertyInput } from "@/components/property-input";
+import { PropertyInput } from "@/components/reusables/property-input";
 import {
   DepthIcon,
   ThicknessIcon,
   RoundnessIcon,
   SmoothnessIcon,
-} from "@/components/icons/right";
-import { Tooltip } from "@/components/tooltip";
+} from "@/components/reusables/icons/right";
+import { Tooltip } from "@/components/reusables/tooltip";
 
 export const Geometry = observer(() => {
   const [isExpanded, setIsExpanded] = useState(true);
@@ -105,16 +105,14 @@ export const Geometry = observer(() => {
         className="w-full flex items-center justify-between px-3 py-2 transition-colors group"
       >
         <span
-          className={`text-[11.5px] font-normal transition-colors ${
-            isExpanded ? "text-fg-50" : "text-fg-60 group-hover:text-fg-50"
-          }`}
+          className={`text-[11.5px] font-normal transition-colors ${isExpanded ? "text-fg-50" : "text-fg-60 group-hover:text-fg-50"
+            }`}
         >
           Geometry
         </span>
         <span
-          className={`transition-colors ${
-            isExpanded ? "text-fg-50" : "text-fg-60 group-hover:text-fg-50"
-          }`}
+          className={`transition-colors ${isExpanded ? "text-fg-50" : "text-fg-60 group-hover:text-fg-50"
+            }`}
         >
           {isExpanded ? <MinusIcon size={12} /> : <PlusIcon size={12} />}
         </span>
@@ -215,10 +213,9 @@ export const Geometry = observer(() => {
                           onClick={() => handleBevelPresetChange(preset.name)}
                           className={`
                             relative overflow-hidden rounded transition-all h-6 w-full
-                            ${
-                              modelState.bevelPreset === preset.name
-                                ? "bg-bk-30 ring-1 ring-bd-50"
-                                : "bg-bk-40 hover:bg-bk-30"
+                            ${modelState.bevelPreset === preset.name
+                              ? "bg-bk-30 ring-1 ring-bd-50"
+                              : "bg-bk-40 hover:bg-bk-30"
                             }
                           `}
                         >
@@ -326,9 +323,8 @@ export const Geometry = observer(() => {
                     <div
                       className="h-full bg-fg-50 rounded-lg transition-all duration-150"
                       style={{
-                        width: `${
-                          ((modelState.autoRotateSpeed - 1) / 9) * 100
-                        }%`,
+                        width: `${((modelState.autoRotateSpeed - 1) / 9) * 100
+                          }%`,
                       }}
                     />
                   </div>

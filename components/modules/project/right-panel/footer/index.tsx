@@ -1,7 +1,7 @@
 "use client";
 
 import { useEditorEngine } from "@/lib/stores/editor/hooks";
-import { Dropdown, useDropdown } from "@/components/dropdown";
+import { Dropdown, useDropdown } from "@/components/reusables/dropdown";
 import { observer } from "mobx-react-lite";
 
 const ZOOM_STEP = 0.05;

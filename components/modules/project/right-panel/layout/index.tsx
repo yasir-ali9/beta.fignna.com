@@ -3,9 +3,9 @@
 import { useEditorEngine } from "@/lib/stores/editor/hooks";
 import { observer } from "mobx-react-lite";
 import { useState, useCallback } from "react";
-import { PropertyInput } from "@/components/property-input";
-import { PlusIcon, MinusIcon } from "@/components/icons/common";
-import { OpacityIcon, AngleIcon } from "@/components/icons/right";
+import { PropertyInput } from "@/components/reusables/property-input";
+import { PlusIcon, MinusIcon } from "@/components/reusables/icons/common";
+import { OpacityIcon, AngleIcon } from "@/components/reusables/icons/right";
 
 export const Layout = observer(() => {
   const [isExpanded, setIsExpanded] = useState(true);
@@ -36,16 +36,14 @@ export const Layout = observer(() => {
         className="w-full flex items-center justify-between px-3 py-2 transition-colors group"
       >
         <span
-          className={`text-[11.5px] font-normal transition-colors ${
-            isExpanded ? "text-fg-50" : "text-fg-60 group-hover:text-fg-50"
-          }`}
+          className={`text-[11.5px] font-normal transition-colors ${isExpanded ? "text-fg-50" : "text-fg-60 group-hover:text-fg-50"
+            }`}
         >
           Layout
         </span>
         <span
-          className={`transition-colors ${
-            isExpanded ? "text-fg-50" : "text-fg-60 group-hover:text-fg-50"
-          }`}
+          className={`transition-colors ${isExpanded ? "text-fg-50" : "text-fg-60 group-hover:text-fg-50"
+            }`}
         >
           {isExpanded ? <MinusIcon size={12} /> : <PlusIcon size={12} />}
         </span>

@@ -3,13 +3,13 @@
 import { useState } from "react";
 import { useEditorEngine } from "@/lib/stores/editor/hooks";
 import { observer } from "mobx-react-lite";
-import { ChevronDownIcon } from "@/components/icons/common";
+import { ChevronDownIcon } from "@/components/reusables/icons/common";
 import {
   ThreeDToolIcon,
   FrameToolIcon,
   ImageToolIcon,
   CommentToolIcon,
-} from "@/components/icons/tools";
+} from "@/components/reusables/icons/tools";
 
 export const NodesPanel = observer(() => {
   const [isExpanded, setIsExpanded] = useState(true);
@@ -61,16 +61,14 @@ export const NodesPanel = observer(() => {
         <div className="flex items-center gap-0.5">
           {/* Chevron Icon */}
           <div
-            className={`transition-transform text-fg-60 ${
-              isExpanded ? "rotate-0" : "-rotate-90"
-            }`}
+            className={`transition-transform text-fg-60 ${isExpanded ? "rotate-0" : "-rotate-90"
+              }`}
           >
             <ChevronDownIcon size={14} />
           </div>
           <span
-            className={`text-[11.5px] font-normal transition-colors ${
-              isExpanded ? "text-fg-50" : "text-fg-60 group-hover:text-fg-50"
-            }`}
+            className={`text-[11.5px] font-normal transition-colors ${isExpanded ? "text-fg-50" : "text-fg-60 group-hover:text-fg-50"
+              }`}
           >
             Nodes
           </span>
@@ -93,13 +91,12 @@ export const NodesPanel = observer(() => {
                 return (
                   <div
                     key={node.id}
-                    className={`flex items-center gap-2 px-2 py-1.5 rounded cursor-pointer transition-colors group ${
-                      editorEngine.nodes.isNodeSelected(node.id)
+                    className={`flex items-center gap-2 px-2 py-1.5 rounded cursor-pointer transition-colors group ${editorEngine.nodes.isNodeSelected(node.id)
                         ? "bg-bk-30"
                         : editorEngine.nodes.hoveredNodeId === node.id
-                        ? "bg-bk-40"
-                        : "hover:bg-bk-40"
-                    }`}
+                          ? "bg-bk-40"
+                          : "hover:bg-bk-40"
+                      }`}
                     onClick={(e) => handleNodeClick(node.id, e)}
                     onMouseEnter={() => handleNodeHover(node.id)}
                     onMouseLeave={() => handleNodeHover(null)}

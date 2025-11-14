@@ -1,7 +1,7 @@
 "use client";
 
-import { Logo } from "@/components/logo";
-import { ContextMenu, useContextMenu } from "@/components/menu/context-menu";
+import { Logo } from "@/components/reusables/logo";
+import { ContextMenu, useContextMenu } from "@/components/reusables/menu/context-menu";
 
 export function Header() {
   const { contextMenu, showContextMenu, hideContextMenu } = useContextMenu();

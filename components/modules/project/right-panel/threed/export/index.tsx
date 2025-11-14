@@ -3,7 +3,7 @@
 import { useEditorEngine } from "@/lib/stores/editor/hooks";
 import { observer } from "mobx-react-lite";
 import { useState } from "react";
-import { PlusIcon, MinusIcon } from "@/components/icons/common";
+import { PlusIcon, MinusIcon } from "@/components/reusables/icons/common";
 import { handleExport, PNG_RESOLUTIONS } from "@/lib/threed/exporters";
 
 export const Export = observer(() => {
@@ -58,16 +58,14 @@ export const Export = observer(() => {
         className="w-full flex items-center justify-between px-3 py-2 transition-colors group"
       >
         <span
-          className={`text-[11.5px] font-normal transition-colors ${
-            isExpanded ? "text-fg-50" : "text-fg-60 group-hover:text-fg-50"
-          }`}
+          className={`text-[11.5px] font-normal transition-colors ${isExpanded ? "text-fg-50" : "text-fg-60 group-hover:text-fg-50"
+            }`}
         >
           Export
         </span>
         <span
-          className={`transition-colors ${
-            isExpanded ? "text-fg-50" : "text-fg-60 group-hover:text-fg-50"
-          }`}
+          className={`transition-colors ${isExpanded ? "text-fg-50" : "text-fg-60 group-hover:text-fg-50"
+            }`}
         >
           {isExpanded ? <MinusIcon size={12} /> : <PlusIcon size={12} />}
         </span>

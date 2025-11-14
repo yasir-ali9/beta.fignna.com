@@ -2,7 +2,7 @@
 
 import { useParams } from "next/navigation";
 import { useEffect } from "react";
-import { ProjectEditor } from "@/modules/project";
+import { ProjectEditor } from "@/components/modules/project";
 import { EditorProvider } from "@/lib/providers/editor-provider";
 import { useEditorEngine } from "@/lib/stores/editor/hooks";
 import { observer } from "mobx-react-lite";

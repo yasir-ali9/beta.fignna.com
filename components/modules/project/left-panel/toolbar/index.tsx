@@ -3,7 +3,7 @@
 import { observer } from "mobx-react-lite";
 import { useEditorEngine } from "@/lib/stores/editor/hooks";
 import { CanvasTool } from "@/lib/stores/editor/state";
-import { Tooltip } from "@/components/tooltip";
+import { Tooltip } from "@/components/reusables/tooltip";
 import {
   MoveToolIcon,
   HandToolIcon,
@@ -12,7 +12,7 @@ import {
   ImageToolIcon,
   CommentToolIcon,
   SearchToolIcon,
-} from "@/components/icons/tools";
+} from "@/components/reusables/icons/tools";
 
 const Toolbar = observer(() => {
   const editorEngine = useEditorEngine();
@@ -88,10 +88,9 @@ const Toolbar = observer(() => {
                   className={`
                     w-9 h-7 flex items-center justify-center rounded-full
                     transition-colors
-                    ${
-                      isActive
-                        ? "bg-bk-20 text-fg-30"
-                        : "text-fg-40 hover:bg-bk-30 hover:text-fg-30"
+                    ${isActive
+                      ? "bg-bk-20 text-fg-30"
+                      : "text-fg-40 hover:bg-bk-30 hover:text-fg-30"
                     }
                   `}
                 >

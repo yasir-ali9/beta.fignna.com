@@ -3,11 +3,11 @@
 import { Header } from "./header";
 import { Footer } from "./footer";
 import { Layout } from "./layout";
-import { Geometry } from "./geometry";
-import { Material } from "./material";
-import { Environment } from "./environment";
-import { Background } from "./background";
-import { Export } from "./export";
+import { Geometry } from "./threed/geometry";
+import { Material } from "./threed/material";
+import { Environment } from "./threed/environment";
+import { Background } from "./threed/background";
+import { Export } from "./threed/export";
 import { observer } from "mobx-react-lite";
 
 export const RightPanel = observer(() => {
