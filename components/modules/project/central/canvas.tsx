@@ -9,6 +9,7 @@ import { interactionsManager } from "@/lib/canvas/interactions";
 import { shortcutsManager } from "@/lib/shortcuts";
 import { ThreeDNodeRenderer } from "@/components/reusables/threed";
 import { RotateIcon } from "@/components/reusables/icons/canvas";
+import { PromptInput } from "../common/prompt-input";
 
 const ZOOM_STEP = 0.05;
 const PAN_SENSITIVITY = 1;
@@ -61,13 +62,18 @@ export const Canvas = observer(() => {
       const worldX = (canvasX - position.x) / scale;
       const worldY = (canvasY - position.y) / scale;
 
-      editorEngine.nodes.addNode({
+      const newNode = editorEngine.nodes.addNode({
         type: pendingNode.type,
         x: worldX - pendingNode.width / 2, // Center on cursor
         y: worldY - pendingNode.height / 2,
         width: pendingNode.width,
         height: pendingNode.height,
       });
+
+      // Auto-show floating prompt when code node is dropped
+      if (newNode.type === "code") {
+        editorEngine.state.setPromptFloating(true);
+      }
 
       // Switch back to move tool
       editorEngine.state.setCanvasTool(
@@ -757,6 +763,13 @@ export const Canvas = observer(() => {
             </React.Fragment>
           );
         })}
+
+      {/* Floating Prompt Input */}
+      {editorEngine.state.isPromptFloating && (
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-50">
+          <PromptInput isFloating={true} />
+        </div>
+      )}
     </div>
   );
 });

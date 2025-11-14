@@ -4,11 +4,14 @@ import { observer } from "mobx-react-lite";
 import { useEditorEngine } from "@/lib/stores/editor/hooks";
 import { CanvasTool } from "@/lib/stores/editor/state";
 import { Tooltip } from "@/components/reusables/tooltip";
+import { Dropdown, useDropdown } from "@/components/reusables/dropdown";
+import { ChevronDownIcon } from "@/components/reusables/icons/common";
 import {
   MoveToolIcon,
   HandToolIcon,
   FrameToolIcon,
   ThreeDToolIcon,
+  CodeToolIcon,
   ImageToolIcon,
   CommentToolIcon,
   SearchToolIcon,
@@ -16,10 +19,10 @@ import {
 
 const Toolbar = observer(() => {
   const editorEngine = useEditorEngine();
+  const moveHandDropdown = useDropdown();
 
+  // Other tools
   const tools = [
-    { id: CanvasTool.MOVE, icon: MoveToolIcon, label: "Move", shortcut: "V" },
-    { id: CanvasTool.HAND, icon: HandToolIcon, label: "Hand", shortcut: "H" },
     {
       id: CanvasTool.FRAME,
       icon: FrameToolIcon,
@@ -30,6 +33,12 @@ const Toolbar = observer(() => {
       id: CanvasTool.THREE_D,
       icon: ThreeDToolIcon,
       label: "3D Tool",
+      shortcut: "",
+    },
+    {
+      id: CanvasTool.CODE,
+      icon: CodeToolIcon,
+      label: "Code",
       shortcut: "",
     },
     {
@@ -54,6 +63,9 @@ const Toolbar = observer(() => {
       case CanvasTool.THREE_D:
         editorEngine.nodes.setPendingNode("3d", 500, 500);
         break;
+      case CanvasTool.CODE:
+        editorEngine.nodes.setPendingNode("code", 400, 300);
+        break;
       case CanvasTool.FRAME:
         editorEngine.nodes.setPendingNode("frame", 300, 300);
         break;
@@ -69,11 +81,77 @@ const Toolbar = observer(() => {
     }
   };
 
+  // Get current active navigation tool (Move or Hand)
+  const activeNavTool =
+    editorEngine.state.activeCanvasTool === CanvasTool.MOVE ||
+    editorEngine.state.activeCanvasTool === CanvasTool.HAND
+      ? editorEngine.state.activeCanvasTool
+      : CanvasTool.MOVE;
+
+  const ActiveNavIcon =
+    activeNavTool === CanvasTool.HAND ? HandToolIcon : MoveToolIcon;
+
+  // Navigation dropdown items
+  const navigationItems = [
+    {
+      label: "Move",
+      icon: MoveToolIcon,
+      shortcut: "V",
+      active: editorEngine.state.canvasTool === CanvasTool.MOVE,
+      onClick: () => handleToolClick(CanvasTool.MOVE),
+    },
+    {
+      label: "Hand",
+      icon: HandToolIcon,
+      shortcut: "H",
+      active: editorEngine.state.canvasTool === CanvasTool.HAND,
+      onClick: () => handleToolClick(CanvasTool.HAND),
+    },
+  ];
+
   return (
-    <div className="px-1.5 pb-1.5">
-      <div className="flex items-center justify-between px-0.5 py-0.5 bg-bk-40 rounded-full">
+    <div className="border-t border-b border-bd-50">
+      <div className="flex items-center justify-between px-3 py-2">
         {/* Tools */}
         <div className="flex items-center">
+          {/* Move/Hand Dropdown */}
+          <Dropdown
+            items={navigationItems}
+            trigger={
+              <Tooltip
+                content={
+                  activeNavTool === CanvasTool.HAND ? "Hand (H)" : "Move (V)"
+                }
+                position="bottom"
+              >
+                <button
+                  className={`
+                  w-11 h-7 flex items-center justify-center gap-0.5 rounded-lg
+                  transition-colors
+                  ${
+                    editorEngine.state.activeCanvasTool === CanvasTool.MOVE ||
+                    editorEngine.state.activeCanvasTool === CanvasTool.HAND
+                      ? "bg-bk-30 text-fg-50"
+                      : "text-fg-60 hover:text-fg-50 hover:bg-bk-40"
+                  }
+                `}
+                >
+                  <ActiveNavIcon size={14} />
+                  <ChevronDownIcon
+                    size={10}
+                    className={`transition-transform ${
+                      moveHandDropdown.isOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+              </Tooltip>
+            }
+            isOpen={moveHandDropdown.isOpen}
+            onToggle={moveHandDropdown.toggle}
+            onClose={moveHandDropdown.close}
+          />
+
+          {/* Other Tools */}
           {tools.map((tool) => {
             const Icon = tool.icon;
             const isActive = editorEngine.state.activeCanvasTool === tool.id;
@@ -86,11 +164,12 @@ const Toolbar = observer(() => {
                 <button
                   onClick={() => handleToolClick(tool.id)}
                   className={`
-                    w-9 h-7 flex items-center justify-center rounded-full
+                    w-9 h-7 flex items-center justify-center rounded-lg
                     transition-colors
-                    ${isActive
-                      ? "bg-bk-20 text-fg-30"
-                      : "text-fg-40 hover:bg-bk-30 hover:text-fg-30"
+                    ${
+                      isActive
+                        ? "bg-bk-30 text-fg-50"
+                        : "text-fg-60 hover:text-fg-50 hover:bg-bk-40"
                     }
                   `}
                 >
@@ -103,7 +182,7 @@ const Toolbar = observer(() => {
 
         {/* Search */}
         <Tooltip content="Search" position="bottom">
-          <button className="w-9 h-7 flex items-center justify-center rounded-full text-fg-40 hover:bg-bk-30 hover:text-fg-30 transition-colors">
+          <button className="w-9 h-7 flex items-center justify-center rounded-lg text-fg-60 hover:text-fg-50 hover:bg-bk-40 transition-colors">
             <SearchToolIcon size={14} />
           </button>
         </Tooltip>

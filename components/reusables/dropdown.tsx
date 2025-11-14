@@ -6,6 +6,9 @@ interface DropdownItem {
   label: string;
   onClick: () => void;
   disabled?: boolean;
+  icon?: React.ComponentType<{ size?: number; className?: string }>;
+  shortcut?: string;
+  active?: boolean;
 }
 
 interface DropdownProps {
@@ -16,6 +19,7 @@ interface DropdownProps {
   onClose: () => void;
   position?: "top" | "bottom";
   align?: "left" | "right";
+  variant?: "default" | "compact";
 }
 
 export function Dropdown({
@@ -26,6 +30,7 @@ export function Dropdown({
   onClose,
   position = "bottom",
   align = "left",
+  variant = "default",
 }: DropdownProps) {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLDivElement>(null);
@@ -81,29 +86,46 @@ export function Dropdown({
           ref={dropdownRef}
           className={`absolute z-50 bg-bk-40 border border-bd-50 rounded-lg shadow-lg py-1 px-1 w-max min-w-[120px] ${getPositionClasses()}`}
         >
-          {items.map((item, index) => (
-            <button
-              key={index}
-              onClick={() => {
-                if (!item.disabled) {
-                  item.onClick();
-                  onClose();
-                }
-              }}
-              disabled={item.disabled}
-              className={`
-                w-full px-3 py-1.5 text-left flex items-center tracking-tight whitespace-nowrap rounded-md transition-all
-                ${
-                  item.disabled
-                    ? "text-fg-60 cursor-not-allowed"
-                    : "text-fg-30 hover:bg-bk-30 hover:text-fg-50 focus:bg-bk-30 focus:text-fg-50 focus:outline-none cursor-pointer"
-                }
-              `}
-              style={{ fontSize: "11px" }}
-            >
-              <span>{item.label}</span>
-            </button>
-          ))}
+          {items.map((item, index) => {
+            const Icon = item.icon;
+
+            return (
+              <button
+                key={index}
+                onClick={() => {
+                  if (!item.disabled) {
+                    item.onClick();
+                    onClose();
+                  }
+                }}
+                disabled={item.disabled}
+                className={`
+                  w-full px-3 py-1.5 text-left flex items-center gap-2 tracking-tight whitespace-nowrap rounded-md transition-all
+                  ${
+                    item.active
+                      ? "bg-bk-30 text-fg-30"
+                      : item.disabled
+                      ? "text-fg-60 cursor-not-allowed"
+                      : "text-fg-50 hover:bg-bk-30 focus:bg-bk-30 focus:outline-none cursor-pointer"
+                  }
+                `}
+                style={{ fontSize: variant === "compact" ? "11px" : "12px" }}
+              >
+                {/* Icon */}
+                {Icon && <Icon size={14} />}
+
+                {/* Label */}
+                <span className="flex-1">{item.label}</span>
+
+                {/* Shortcut */}
+                {item.shortcut && (
+                  <span className="text-xs text-fg-60 ml-auto">
+                    {item.shortcut}
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </div>
       )}
     </div>

@@ -5,6 +5,7 @@ export enum CanvasTool {
   HAND = "HAND",
   FRAME = "FRAME",
   THREE_D = "THREE_D",
+  CODE = "CODE",
   IMAGE = "IMAGE",
   COMMENT = "COMMENT",
 }
@@ -20,6 +21,8 @@ export class StateManager {
 
   // UI states
   isLoading: boolean = false;
+  isChatPanelOpen: boolean = false;
+  isPromptFloating: boolean = false;
 
   // Project states
   projectName: string = "Untitled Project";
@@ -50,6 +53,23 @@ export class StateManager {
   // Loading state
   setLoading(loading: boolean) {
     this.isLoading = loading;
+  }
+
+  // Chat panel management
+  setChatPanelOpen(open: boolean) {
+    this.isChatPanelOpen = open;
+  }
+
+  toggleChatPanel() {
+    this.isChatPanelOpen = !this.isChatPanelOpen;
+  }
+
+  setPromptFloating(floating: boolean) {
+    this.isPromptFloating = floating;
+  }
+
+  togglePromptLocation() {
+    this.isPromptFloating = !this.isPromptFloating;
   }
 
   // Project management
@@ -89,5 +109,9 @@ export class StateManager {
 
   get isCommentToolActive(): boolean {
     return this.activeCanvasTool === CanvasTool.COMMENT;
+  }
+
+  get isCodeToolActive(): boolean {
+    return this.activeCanvasTool === CanvasTool.CODE;
   }
 }

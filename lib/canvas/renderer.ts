@@ -161,6 +161,26 @@ export class CanvasRenderer {
         node.x + node.width / 2,
         node.y + node.height / 2
       );
+    } else if (node.type === "code") {
+      // Draw code element
+      this.ctx.fillStyle = "#2a2a3a";
+      this.ctx.strokeStyle = isPending ? "#7a7aff" : "#5a5a7a";
+      this.ctx.lineWidth = isPending ? 2 : 1;
+      this.ctx.setLineDash(isPending ? [5, 5] : []);
+
+      this.ctx.fillRect(node.x, node.y, node.width, node.height);
+      this.ctx.strokeRect(node.x, node.y, node.width, node.height);
+
+      // Draw "Hello World" text
+      this.ctx.fillStyle = "#a0a0c0";
+      this.ctx.font = "14px 'JetBrains Mono', monospace";
+      this.ctx.textAlign = "center";
+      this.ctx.textBaseline = "middle";
+      this.ctx.fillText(
+        "Hello World",
+        node.x + node.width / 2,
+        node.y + node.height / 2
+      );
     } else if (node.type === "comment") {
       // Draw comment bubble
       this.ctx.fillStyle = "#5a5a2a";

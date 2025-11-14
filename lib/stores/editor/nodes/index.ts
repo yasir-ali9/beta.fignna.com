@@ -2,7 +2,7 @@ import { makeAutoObservable } from "mobx";
 
 export interface CanvasNode {
   id: string;
-  type: "frame" | "3d" | "image" | "comment";
+  type: "frame" | "3d" | "code" | "image" | "comment";
   x: number;
   y: number;
   width: number;
