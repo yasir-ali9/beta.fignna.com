@@ -13,6 +13,7 @@ export const PromptInput = observer(
   ({ isFloating = false, onSubmit }: PromptInputProps) => {
     const [message, setMessage] = useState("");
     const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
 
     // Auto-resize textarea
     useEffect(() => {
@@ -21,6 +22,27 @@ export const PromptInput = observer(
         textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
       }
     }, [message]);
+
+    // Prevent canvas zoom/scroll and browser zoom when hovering or interacting with floating prompt
+    useEffect(() => {
+      if (!isFloating || !containerRef.current) return;
+
+      const handleWheel = (e: WheelEvent) => {
+        // Prevent browser zoom (Ctrl+scroll)
+        if (e.ctrlKey || e.metaKey) {
+          e.preventDefault();
+        }
+        // Prevent canvas zoom/scroll
+        e.stopPropagation();
+      };
+
+      const container = containerRef.current;
+      container.addEventListener("wheel", handleWheel, { passive: false });
+
+      return () => {
+        container.removeEventListener("wheel", handleWheel);
+      };
+    }, [isFloating]);
 
     const handleSubmit = () => {
       if (!message.trim()) return;
@@ -49,10 +71,11 @@ export const PromptInput = observer(
 
     return (
       <div
+        ref={containerRef}
         className={`
         ${
           isFloating
-            ? "fixed bottom-0 left-1/2 -translate-x-1/2 w-[500px] bg-bk-50 border border-bd-50"
+            ? "fixed bottom-0 left-1/2 -translate-x-1/2 w-[500px] bg-bk-50"
             : "w-full bg-bk-40"
         }
         rounded-lg

@@ -12,7 +12,7 @@ import { RotateIcon } from "@/components/reusables/icons/canvas";
 import { PromptInput } from "../common/prompt-input";
 
 const ZOOM_STEP = 0.05;
-const PAN_SENSITIVITY = 1;
+const PAN_SENSITIVITY = 0.5;
 
 export const Canvas = observer(() => {
   const editorEngine = useEditorEngine();
