@@ -25,7 +25,7 @@ export const ChatPanel = observer(() => {
       : "/svgs/home/logo-outline-light.svg";
 
   return (
-    <div className="h-full flex flex-col border-l border-bd-50">
+    <div className="h-full flex flex-col">
       {/* Chat messages area */}
       <div className="flex-1 overflow-auto p-4">
         <div className="flex items-center justify-center mt-8">

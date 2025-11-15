@@ -6,22 +6,24 @@ import {
   ContextMenu,
   useContextMenu,
 } from "@/components/reusables/menu/context-menu";
+import { useTheme } from "@/lib/providers/theme-provider";
 
 export function Header() {
   const { contextMenu, showContextMenu, hideContextMenu } = useContextMenu();
   const [projectName, setProjectName] = useState("Fignna");
   const [isEditing, setIsEditing] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const { theme, toggleTheme } = useTheme();
 
   const contextMenuItems = [
     {
-      label: "New Project",
+      label: "New project",
       onClick: () => {
         window.location.href = "/";
       },
     },
     {
-      label: "Save Project",
+      label: "Save project",
       onClick: () => {
         console.log("Save project");
       },
@@ -30,6 +32,12 @@ export function Header() {
       label: "Export",
       onClick: () => {
         console.log("Export");
+      },
+    },
+    {
+      label: theme === "dark" ? "Light theme" : "Dark theme",
+      onClick: () => {
+        toggleTheme();
       },
     },
     {

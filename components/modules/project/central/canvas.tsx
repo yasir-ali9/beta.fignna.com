@@ -126,7 +126,7 @@ export const Canvas = observer(() => {
                 node
               );
               setIsLayerDragging(true);
-              document.body.style.cursor = "move";
+              document.body.style.cursor = "default";
             }
             return;
           }
@@ -283,7 +283,7 @@ export const Canvas = observer(() => {
                 selectedLayer
               )
             ) {
-              setCursor("move");
+              setCursor("default");
               return;
             }
           }

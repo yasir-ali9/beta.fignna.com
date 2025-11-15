@@ -40,15 +40,15 @@ function HomePageInner() {
     <div className="flex min-h-screen items-center justify-center bg-bk-60 font-sans">
       <div className="w-full max-w-md p-8">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-fg-50 mb-2">Vecto3D</h1>
+          <h1 className="text-3xl font-bold text-fg-50 mb-2">Fignna</h1>
           <p className="text-fg-30 text-sm">
-            Convert SVG/Vector graphics to 3D models
+            Build workflows
           </p>
         </div>
 
         <div className="bg-bk-50 rounded-lg p-6 border border-bd-50">
           <h2 className="text-lg font-medium text-fg-50 mb-4">
-            Create New Project
+            Create new project
           </h2>
 
           <div className="space-y-4">

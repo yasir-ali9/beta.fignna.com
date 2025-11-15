@@ -75,7 +75,7 @@ export const PromptInput = observer(
         className={`
         ${
           isFloating
-            ? "fixed bottom-0 left-1/2 -translate-x-1/2 w-[500px] bg-bk-50"
+            ? "fixed bottom-0 left-1/2 -translate-x-1/2 w-[500px] bg-bk-50 border border-bd-50"
             : "w-full bg-bk-40"
         }
         rounded-lg
